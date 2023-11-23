@@ -20,24 +20,23 @@ namespace RobotGame
             PlayerUpTexture,
             PlayerDownTexture,
             PlayerLeftTexture,
-            PlayerRightTexture;
+            PlayerRightTexture,
+
+            PlayerBulletTexture;
 
         public SpriteSystem SpriteSystem = new();
-        public SpriteAnimationSystem SpriteAnimationSystem = new();
+        public SpriteAnimatorSystem SpriteAnimatorSystem = new();
 
-        public static void InitializePlayer(RobotGame game)
+        public RobotGame Game;
+
+        public Renderer(RobotGame game)
         {
-            Texture2D texture = game.Renderer.PlayerDownTexture;
-            List<Rectangle> frames = SpriteSystem.GetFrames(texture, 3);
-
-            game.World.Player.Add(
-                new SpriteComponent { Texture = texture, Frame = frames[0] },
-                new SpriteAnimationComponent { Frames = frames, FramesPerSecond = 10.0f });
+            Game = game;
         }
 
-        public void DrawWorld(RobotGame game)
+        public void DrawWorld()
         {
-            World entities = game.World.Entities;
+            World entities = Game.World.Entities;
 
             SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
@@ -46,17 +45,17 @@ namespace RobotGame
             SpriteBatch.End();
         }
 
-        public void Initialize(RobotGame game)
+        public void Initialize()
         {
-            GraphicsDeviceManager graphics = game.Graphics;
-            GraphicsDevice graphicsDevice = game.GraphicsDevice;
+            GraphicsDeviceManager graphics = Game.Graphics;
+            GraphicsDevice graphicsDevice = Game.GraphicsDevice;
 
-            graphics.PreferredBackBufferWidth = 320 * 2;
-            graphics.PreferredBackBufferHeight = 240 * 2;
+            graphics.PreferredBackBufferWidth = 240 * 3;
+            graphics.PreferredBackBufferHeight = 180 * 3;
 
             graphics.ApplyChanges();
 
-            RenderTarget = new RenderTarget2D(graphicsDevice, 320, 240);
+            RenderTarget = new RenderTarget2D(graphicsDevice, 240, 180);
 
             RenderTargetRect = new Rectangle(0, 0,
                 graphics.PreferredBackBufferWidth,
@@ -65,33 +64,33 @@ namespace RobotGame
             SpriteBatch = new SpriteBatch(graphicsDevice);
         }
 
-        public void LoadContent(RobotGame game)
+        public void LoadContent()
         {
-            ContentManager content = game.Content;
+            ContentManager content = Game.Content;
 
             PlayerUpTexture = content.Load<Texture2D>("Textures/player_up");
             PlayerDownTexture = content.Load<Texture2D>("Textures/player_down");
             PlayerLeftTexture = content.Load<Texture2D>("Textures/player_left");
             PlayerRightTexture = content.Load<Texture2D>("Textures/player_right");
 
-            InitializePlayer(game);
+            PlayerBulletTexture = content.Load<Texture2D>("Textures/player_bullet");
         }
 
-        public void Update(RobotGame game, float delta)
+        public void Update(float delta)
         {
-            World entities = game.World.Entities;
+            World entities = Game.World.Entities;
 
-            SpriteAnimationSystem.Update(entities, delta);
+            SpriteAnimatorSystem.Update(entities, delta);
         }
 
-        public void Draw(RobotGame game)
+        public void Draw()
         {
-            GraphicsDevice graphicsDevice = game.GraphicsDevice;
+            GraphicsDevice graphicsDevice = Game.GraphicsDevice;
 
             graphicsDevice.SetRenderTarget(RenderTarget);
             graphicsDevice.Clear(Color.Black);
 
-            DrawWorld(game);
+            DrawWorld();
 
             graphicsDevice.SetRenderTarget(null);
             graphicsDevice.Clear(Color.Black);

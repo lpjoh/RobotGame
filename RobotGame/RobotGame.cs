@@ -7,8 +7,10 @@ namespace RobotGame
     {
         public GraphicsDeviceManager Graphics;
 
-        public GameWorld World = new();
-        public Renderer Renderer = new();
+        public GameWorld World;
+        public Renderer Renderer;
+
+        public Input Input = new();
 
         public RobotGame()
         {
@@ -16,19 +18,23 @@ namespace RobotGame
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            World = new GameWorld(this);
+            Renderer = new Renderer(this);
         }
 
         protected override void Initialize()
         {
-            World.Initialize(this);
-            Renderer.Initialize(this);
+            Renderer.Initialize();
 
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            Renderer.LoadContent(this);
+            Renderer.LoadContent();
+
+            World.Initialize();
 
             base.LoadContent();
         }
@@ -40,14 +46,15 @@ namespace RobotGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            Renderer.Update(this, delta);
+            World.Update(delta);
+            Renderer.Update(delta);
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            Renderer.Draw(this);
+            Renderer.Draw();
 
             base.Draw(gameTime);
         }

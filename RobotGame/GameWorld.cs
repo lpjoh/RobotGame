@@ -1,6 +1,8 @@
 ﻿using Arch.Core;
 using RobotGame.Components;
 using Microsoft.Xna.Framework;
+using RobotGame.Systems;
+using System.Collections.Generic;
 
 namespace RobotGame
 {
@@ -10,12 +12,38 @@ namespace RobotGame
 
         public Entity Player;
 
-        public void Initialize(RobotGame game)
+        public RobotGame Game;
+
+        public PlayerSystem PlayerSystem;
+        public PhysicsBodySystem PhysicsBodySystem;
+
+        public List<ISystem> Systems = new();
+
+        public GameWorld(RobotGame game)
+        {
+            Game = game;
+
+            PlayerSystem = new PlayerSystem(Game);
+            Systems.Add(PlayerSystem);
+
+            PhysicsBodySystem = new PhysicsBodySystem();
+            Systems.Add(PhysicsBodySystem);
+        }
+
+        public void Initialize()
         {
             Entities = World.Create();
 
-            Player = Entities.Create(
-                new PositionComponent { Position = new Vector2(0, 0) });
+            PlayerSystem.Initialize();
+            Player = PlayerSystem.CreatePlayer(Entities);
+        }
+
+        public void Update(float delta)
+        {
+            foreach (ISystem system in Systems)
+            {
+                system.Update(Entities, delta);
+            }
         }
     }
 }
