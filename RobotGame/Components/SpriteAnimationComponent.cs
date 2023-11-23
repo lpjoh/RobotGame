@@ -7,7 +7,7 @@ namespace RobotGame.Components
     public struct SpriteAnimationComponent
     {
         public List<Rectangle> Frames;
-        public float FrameDuration;
+        public float FramesPerSecond;
 
         public float Time;
     }

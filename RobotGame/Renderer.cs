@@ -32,7 +32,7 @@ namespace RobotGame
 
             game.World.Player.Add(
                 new SpriteComponent { Texture = texture, Frame = frames[0] },
-                new SpriteAnimationComponent { Frames = frames, FrameDuration = 0.1f });
+                new SpriteAnimationComponent { Frames = frames, FramesPerSecond = 10.0f });
         }
 
         public void DrawWorld(RobotGame game)

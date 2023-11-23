@@ -18,11 +18,11 @@ namespace RobotGame.Systems
                 ref SpriteComponent sprite,
                 ref SpriteAnimationComponent animation) =>
             {
-                float duration = animation.FrameDuration * animation.Frames.Count;
-                int frame = (int)(animation.Time / animation.FrameDuration);
+                int frameIndex = (int)animation.Time;
+                sprite.Frame = animation.Frames[frameIndex];
 
-                sprite.Frame = animation.Frames[frame];
-                animation.Time = (animation.Time + delta) % duration;
+                animation.Time += delta * animation.FramesPerSecond;
+                animation.Time %= animation.Frames.Count;
             });
         }
     }
