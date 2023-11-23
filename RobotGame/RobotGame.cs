@@ -7,6 +7,7 @@ namespace RobotGame
     {
         public GraphicsDeviceManager Graphics;
 
+        public GameWorld World = new();
         public Renderer Renderer = new();
 
         public RobotGame()
@@ -19,27 +20,34 @@ namespace RobotGame
 
         protected override void Initialize()
         {
-            Renderer.Initialize(Graphics, GraphicsDevice);
+            World.Initialize(this);
+            Renderer.Initialize(this);
+
+            base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            Renderer.LoadContent(Content);
+            Renderer.LoadContent(this);
+
+            base.LoadContent();
         }
 
         protected override void Update(GameTime gameTime)
         {
+            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            Renderer.Update(this, delta);
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            Renderer.Draw();
+            Renderer.Draw(this);
 
             base.Draw(gameTime);
         }
