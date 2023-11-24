@@ -1,4 +1,5 @@
 ﻿using Arch.Core;
+using Arch.Core.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,9 +14,9 @@ namespace RobotGame.Systems
         public const float Acceleration = 400.0f;
         public const float MaxSpeed = 60.0f;
 
-        public QueryDescription Query;
-
         public SpriteAnimation IdleAnimation, WalkAnimation;
+
+        public QueryDescription Query;
 
         public RobotGame Game;
 
@@ -36,7 +37,7 @@ namespace RobotGame.Systems
             Entity entity = entities.Create(
                 new PlayerComponent { FacingDirection = new Vector2(0, 1) },
                 new PositionComponent { Position = new Vector2(0, 0) },
-                new PhysicsBodyComponent(),
+                new PhysicsBodyComponent { Size = new Vector2(16, 16) },
                 new SpriteComponent { Texture = Game.Renderer.PlayerDownTexture },
                 new SpriteAnimatorComponent());
 
@@ -97,6 +98,63 @@ namespace RobotGame.Systems
             }
         }
 
+        public void Move(PhysicsBodyComponent body, Vector2 moveDirection, float delta)
+        {
+            body.Velocity.X = ApplyMovement(body.Velocity.X, moveDirection.X, delta);
+            body.Velocity.Y = ApplyMovement(body.Velocity.Y, moveDirection.Y, delta);
+        }
+
+        public void Shoot(
+            PlayerComponent player,
+            PositionComponent position,
+            PhysicsBodyComponent body,
+            World entities,
+            Vector2 shootDirection,
+            float delta)
+        {
+            if (player.ShootTimer <= 0)
+            {
+                if (shootDirection != Vector2.Zero)
+                {
+                    BulletSystem bulletSystem = Game.World.BulletSystem;
+
+                    Vector2 bulletPosition =
+                        position.Position + (body.Size - bulletSystem.BulletSize) * 0.5f;
+
+                    bulletSystem.CreateBullet(
+                        entities, bulletPosition, shootDirection);
+
+                    player.ShootTimer = 0.2f;
+                }
+            }
+            else
+            {
+                player.ShootTimer -= delta;
+            }
+        }
+
+        public void Animate(
+            Entity entity,
+            PlayerComponent player,
+            SpriteComponent sprite,
+            Vector2 moveDirection)
+        {
+            if (moveDirection == Vector2.Zero)
+            {
+                SpriteAnimatorSystem.PlayAnimation(entity, IdleAnimation);
+            }
+            else
+            {
+                if (Vector2.Dot(player.FacingDirection, moveDirection) <= 0.0)
+                {
+                    player.FacingDirection = GetFacingDirection(moveDirection);
+                    sprite.Texture = GetFacingTexture(player.FacingDirection);
+                }
+
+                SpriteAnimatorSystem.PlayAnimation(entity, WalkAnimation);
+            }
+        }
+
         public void Initialize()
         {
             Texture2D texture = Game.Renderer.PlayerDownTexture;
@@ -122,29 +180,12 @@ namespace RobotGame.Systems
             {
                 Input input = Game.Input;
 
-                Vector2 moveDirection = new(
-                    (input.IsKeyPressed(Keys.D) ? 1.0f : 0.0f) -
-                    (input.IsKeyPressed(Keys.A) ? 1.0f : 0.0f),
-                    (input.IsKeyPressed(Keys.S) ? 1.0f : 0.0f) -
-                    (input.IsKeyPressed(Keys.W) ? 1.0f : 0.0f));
+                Vector2 moveDirection = input.GetAxis(Keys.W, Keys.S, Keys.A, Keys.D);
+                Vector2 shootDirection = input.GetAxis(Keys.Up, Keys.Down, Keys.Left, Keys.Right);
 
-                body.Velocity.X = ApplyMovement(body.Velocity.X, moveDirection.X, delta);
-                body.Velocity.Y = ApplyMovement(body.Velocity.Y, moveDirection.Y, delta);
-
-                if (moveDirection == Vector2.Zero)
-                {
-                    SpriteAnimatorSystem.PlayAnimation(entity, IdleAnimation);
-                }
-                else
-                {
-                    if (Vector2.Dot(player.FacingDirection, moveDirection) <= 0.0)
-                    {
-                        player.FacingDirection = GetFacingDirection(moveDirection);
-                        sprite.Texture = GetFacingTexture(player.FacingDirection);
-                    }
-
-                    SpriteAnimatorSystem.PlayAnimation(entity, WalkAnimation);
-                }
+                Move(body, moveDirection, delta);
+                Shoot(player, position, body, entities, shootDirection, delta);
+                Animate(entity, player, sprite, moveDirection);
             });
         }
     }

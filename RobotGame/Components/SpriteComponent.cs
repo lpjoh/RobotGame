@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace RobotGame.Components
 {
-    struct SpriteComponent
+    public struct SpriteComponent
     {
         public Texture2D Texture;
         public Rectangle Frame;

@@ -14,8 +14,9 @@ namespace RobotGame
 
         public RobotGame Game;
 
-        public PlayerSystem PlayerSystem;
         public PhysicsBodySystem PhysicsBodySystem;
+        public PlayerSystem PlayerSystem;
+        public BulletSystem BulletSystem;
 
         public List<ISystem> Systems = new();
 
@@ -23,11 +24,14 @@ namespace RobotGame
         {
             Game = game;
 
+            PhysicsBodySystem = new PhysicsBodySystem();
+            Systems.Add(PhysicsBodySystem);
+
             PlayerSystem = new PlayerSystem(Game);
             Systems.Add(PlayerSystem);
 
-            PhysicsBodySystem = new PhysicsBodySystem();
-            Systems.Add(PhysicsBodySystem);
+            BulletSystem = new BulletSystem(Game);
+            Systems.Add(BulletSystem);
         }
 
         public void Initialize()
@@ -35,6 +39,8 @@ namespace RobotGame
             Entities = World.Create();
 
             PlayerSystem.Initialize();
+            BulletSystem.Initialize();
+
             Player = PlayerSystem.CreatePlayer(Entities);
         }
 

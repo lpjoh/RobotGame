@@ -14,6 +14,9 @@ namespace RobotGame
         public RenderTarget2D RenderTarget;
         public Rectangle RenderTargetRect;
 
+        public GraphicsDeviceManager Graphics;
+        public GraphicsDevice GraphicsDevice;
+
         public SpriteBatch SpriteBatch;
 
         public Texture2D
@@ -26,12 +29,14 @@ namespace RobotGame
 
         public SpriteSystem SpriteSystem = new();
         public SpriteAnimatorSystem SpriteAnimatorSystem = new();
+        public PhysicsBodyRendererSystem PhysicsBodyRendererSystem;
 
         public RobotGame Game;
 
         public Renderer(RobotGame game)
         {
             Game = game;
+            PhysicsBodyRendererSystem = new PhysicsBodyRendererSystem(this);
         }
 
         public void DrawWorld()
@@ -41,27 +46,30 @@ namespace RobotGame
             SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
             SpriteSystem.Draw(entities, this);
+            //PhysicsBodyRendererSystem.Draw(entities, this);
 
             SpriteBatch.End();
         }
 
         public void Initialize()
         {
-            GraphicsDeviceManager graphics = Game.Graphics;
-            GraphicsDevice graphicsDevice = Game.GraphicsDevice;
+            Graphics = Game.Graphics;
+            GraphicsDevice = Game.GraphicsDevice;
 
-            graphics.PreferredBackBufferWidth = 240 * 3;
-            graphics.PreferredBackBufferHeight = 180 * 3;
+            Graphics.PreferredBackBufferWidth = 240 * 3;
+            Graphics.PreferredBackBufferHeight = 180 * 3;
 
-            graphics.ApplyChanges();
+            Graphics.ApplyChanges();
 
-            RenderTarget = new RenderTarget2D(graphicsDevice, 240, 180);
+            RenderTarget = new RenderTarget2D(GraphicsDevice, 240, 180);
 
             RenderTargetRect = new Rectangle(0, 0,
-                graphics.PreferredBackBufferWidth,
-                graphics.PreferredBackBufferHeight);
+                Graphics.PreferredBackBufferWidth,
+                Graphics.PreferredBackBufferHeight);
 
-            SpriteBatch = new SpriteBatch(graphicsDevice);
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
+
+            PhysicsBodyRendererSystem.Initialize();
         }
 
         public void LoadContent()
@@ -85,15 +93,13 @@ namespace RobotGame
 
         public void Draw()
         {
-            GraphicsDevice graphicsDevice = Game.GraphicsDevice;
-
-            graphicsDevice.SetRenderTarget(RenderTarget);
-            graphicsDevice.Clear(Color.Black);
+            GraphicsDevice.SetRenderTarget(RenderTarget);
+            GraphicsDevice.Clear(Color.Black);
 
             DrawWorld();
 
-            graphicsDevice.SetRenderTarget(null);
-            graphicsDevice.Clear(Color.Black);
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.Black);
 
             SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
             SpriteBatch.Draw(RenderTarget, RenderTargetRect, Color.White);
