@@ -75,19 +75,6 @@ namespace RobotGame.Systems
             return Game.Renderer.PlayerDownTexture;
         }
 
-        public void Initialize()
-        {
-            Texture2D texture = Game.Renderer.PlayerDownTexture;
-
-            List<Rectangle>
-                spriteFrames = SpriteAnimation.GetFrames(texture, 3),
-                idleFrames = new() { spriteFrames[0] },
-                walkFrames = new() { spriteFrames[0], spriteFrames[1], spriteFrames[2] };
-
-            IdleAnimation = new SpriteAnimation(idleFrames, 0.0f);
-            WalkAnimation = new SpriteAnimation(walkFrames, 10.0f);
-        }
-
         public float ApplyMovement(float velocity, float moveDirection, float delta)
         {
             if (moveDirection == 0.0f)
@@ -106,6 +93,19 @@ namespace RobotGame.Systems
                 float newVelocity = velocity + Acceleration * moveDirection * delta;
                 return Math.Clamp(newVelocity, -MaxSpeed, MaxSpeed);
             }
+        }
+
+        public void Initialize()
+        {
+            Texture2D texture = Game.Renderer.PlayerDownTexture;
+
+            List<Rectangle>
+                spriteFrames = SpriteAnimation.GetFrames(texture, 3),
+                idleFrames = new() { spriteFrames[0] },
+                walkFrames = new() { spriteFrames[0], spriteFrames[1], spriteFrames[2] };
+
+            IdleAnimation = new SpriteAnimation(idleFrames, 0.0f);
+            WalkAnimation = new SpriteAnimation(walkFrames, 10.0f);
         }
 
         public void Update(World entities, float delta)
