@@ -57,22 +57,24 @@ namespace RobotGame.Systems
 
         public Texture2D GetFacingTexture(Vector2 direction)
         {
+            Renderer renderer = Game.Renderer;
+
             if (direction.Y == 0.0f)
             {
                 if (direction.X < 0.0f)
                 {
-                    return Game.Renderer.PlayerLeftTexture;
+                    return renderer.PlayerLeftTexture;
                 }
 
-                return Game.Renderer.PlayerRightTexture;
+                return renderer.PlayerRightTexture;
             }
 
             if (direction.Y < 0.0f)
             {
-                return Game.Renderer.PlayerUpTexture;
+                return renderer.PlayerUpTexture;
             }
 
-            return Game.Renderer.PlayerDownTexture;
+            return renderer.PlayerDownTexture;
         }
 
         public float ApplyMovement(float velocity, float moveDirection, float delta)
