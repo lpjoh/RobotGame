@@ -1,4 +1,5 @@
 ﻿using Arch.Core;
+using Arch.Core.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RobotGame.Components;
@@ -38,7 +39,7 @@ namespace RobotGame.Systems
                 new SpriteComponent { Texture = Game.Renderer.PlayerBulletTexture },
                 new SpriteAnimatorComponent());
 
-            SpriteAnimatorSystem.PlayAnimation(entity, FlashAnimation);
+            SpriteAnimatorSystem.PlayAnimation(ref entity.Get<SpriteAnimatorComponent>(), FlashAnimation);
 
             return entity;
         }

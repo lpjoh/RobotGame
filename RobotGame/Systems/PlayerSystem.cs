@@ -9,6 +9,15 @@ using System.Collections.Generic;
 
 namespace RobotGame.Systems
 {
+    public ref struct PlayerData
+    {
+        public ref PlayerComponent Player;
+        public ref PositionComponent Position;
+        public ref PhysicsBodyComponent Body;
+        public ref SpriteComponent Sprite;
+        public ref SpriteAnimatorComponent SpriteAnimator;
+    }
+
     public class PlayerSystem : ISystem
     {
         public const float Acceleration = 400.0f;
@@ -41,7 +50,7 @@ namespace RobotGame.Systems
                 new SpriteComponent { Texture = Game.Renderer.PlayerDownTexture },
                 new SpriteAnimatorComponent());
 
-            SpriteAnimatorSystem.PlayAnimation(entity, IdleAnimation);
+            SpriteAnimatorSystem.PlayAnimation(ref entity.Get<SpriteAnimatorComponent>(), IdleAnimation);
 
             return entity;
         }
@@ -98,60 +107,58 @@ namespace RobotGame.Systems
             }
         }
 
-        public void Move(PhysicsBodyComponent body, Vector2 moveDirection, float delta)
+        public void Move(ref PlayerData playerData, Vector2 moveDirection, float delta)
         {
-            body.Velocity.X = ApplyMovement(body.Velocity.X, moveDirection.X, delta);
-            body.Velocity.Y = ApplyMovement(body.Velocity.Y, moveDirection.Y, delta);
+            playerData.Body.Velocity.X =
+                ApplyMovement(playerData.Body.Velocity.X, moveDirection.X, delta);
+
+            playerData.Body.Velocity.Y =
+                ApplyMovement(playerData.Body.Velocity.Y, moveDirection.Y, delta);
         }
 
         public void Shoot(
-            PlayerComponent player,
-            PositionComponent position,
-            PhysicsBodyComponent body,
+            ref PlayerData playerData,
             World entities,
             Vector2 shootDirection,
             float delta)
         {
-            if (player.ShootTimer <= 0)
+            if (playerData.Player.ShootTimer <= 0)
             {
                 if (shootDirection != Vector2.Zero)
                 {
                     BulletSystem bulletSystem = Game.World.BulletSystem;
 
                     Vector2 bulletPosition =
-                        position.Position + (body.Size - bulletSystem.BulletSize) * 0.5f;
+                        playerData.Position.Position +
+                        (playerData.Body.Size - bulletSystem.BulletSize) * 0.5f;
 
                     bulletSystem.CreateBullet(
                         entities, bulletPosition, shootDirection);
 
-                    player.ShootTimer = 0.2f;
+                    playerData.Player.ShootTimer = 0.2f;
                 }
             }
             else
             {
-                player.ShootTimer -= delta;
+                playerData.Player.ShootTimer -= delta;
             }
         }
 
-        public void Animate(
-            Entity entity,
-            PlayerComponent player,
-            SpriteComponent sprite,
-            Vector2 moveDirection)
+        public void Animate(ref PlayerData playerData, Vector2 moveDirection)
         {
             if (moveDirection == Vector2.Zero)
             {
-                SpriteAnimatorSystem.PlayAnimation(entity, IdleAnimation);
+                SpriteAnimatorSystem.PlayAnimation(ref playerData.SpriteAnimator, IdleAnimation);
             }
             else
             {
-                if (Vector2.Dot(player.FacingDirection, moveDirection) <= 0.0)
+                if (Vector2.Dot(playerData.Player.FacingDirection, moveDirection) <= 0.0)
                 {
-                    player.FacingDirection = GetFacingDirection(moveDirection);
-                    sprite.Texture = GetFacingTexture(player.FacingDirection);
+                    playerData.Player.FacingDirection = GetFacingDirection(moveDirection);
+                    playerData.Sprite.Texture = GetFacingTexture(playerData.Player.FacingDirection);
                 }
 
-                SpriteAnimatorSystem.PlayAnimation(entity, WalkAnimation);
+                SpriteAnimatorSystem.PlayAnimation(ref playerData.SpriteAnimator, WalkAnimation);
             }
         }
 
@@ -171,21 +178,30 @@ namespace RobotGame.Systems
         public void Update(World entities, float delta)
         {
             entities.Query(in Query, (
-                Entity entity,
+                ref Entity entity,
                 ref PlayerComponent player,
                 ref PositionComponent position,
                 ref PhysicsBodyComponent body,
                 ref SpriteComponent sprite,
-                ref SpriteAnimatorComponent animator) =>
+                ref SpriteAnimatorComponent spriteAnimator) =>
             {
+                PlayerData playerData = new()
+                {
+                    Player = ref player,
+                    Position = ref position,
+                    Body = ref body,
+                    Sprite = ref sprite,
+                    SpriteAnimator = ref spriteAnimator
+                };
+
                 Input input = Game.Input;
 
                 Vector2 moveDirection = input.GetAxis(Keys.W, Keys.S, Keys.A, Keys.D);
                 Vector2 shootDirection = input.GetAxis(Keys.Up, Keys.Down, Keys.Left, Keys.Right);
 
-                Move(body, moveDirection, delta);
-                Shoot(player, position, body, entities, shootDirection, delta);
-                Animate(entity, player, sprite, moveDirection);
+                Move(ref playerData, moveDirection, delta);
+                Shoot(ref playerData, entities, shootDirection, delta);
+                Animate(ref playerData, moveDirection);
             });
         }
     }

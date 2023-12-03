@@ -15,7 +15,7 @@ namespace RobotGame.Systems
         public void Update(World entities, float delta)
         {
             entities.Query(in Query, (
-                Entity entity,
+                ref Entity entity,
                 ref PhysicsBodyComponent body,
                 ref PositionComponent position) =>
             {

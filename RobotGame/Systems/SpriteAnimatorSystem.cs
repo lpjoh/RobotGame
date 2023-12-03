@@ -13,10 +13,8 @@ namespace RobotGame.Systems
             Query = new QueryDescription().WithAll<SpriteComponent, SpriteAnimatorComponent>();
         }
 
-        public static void PlayAnimation(Entity entity, SpriteAnimation animation)
+        public static void PlayAnimation(ref SpriteAnimatorComponent animator, SpriteAnimation animation)
         {
-            ref SpriteAnimatorComponent animator = ref entity.Get<SpriteAnimatorComponent>();
-
             if (animator.Animation == animation)
             {
                 return;
@@ -29,11 +27,16 @@ namespace RobotGame.Systems
         public void Update(World entities, float delta)
         {
             entities.Query(in Query, (
-                Entity entity,
+                ref Entity entity,
                 ref SpriteComponent sprite,
                 ref SpriteAnimatorComponent animator) =>
             {
                 SpriteAnimation animation = animator.Animation;
+
+                if (animation == null)
+                {
+                    return;
+                }
 
                 int frameIndex = (int)animator.Time;
                 sprite.Frame = animation.Frames[frameIndex];
