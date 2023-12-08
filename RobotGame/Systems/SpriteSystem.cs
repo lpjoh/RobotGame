@@ -16,7 +16,7 @@ namespace RobotGame.Systems
         public void Draw(World entities, Renderer renderer)
         {
             entities.Query(in Query, (
-                ref Entity entity,
+                Entity entity,
                 ref SpriteComponent sprite,
                 ref PositionComponent position) =>
             {

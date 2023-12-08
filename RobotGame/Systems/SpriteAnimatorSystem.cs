@@ -34,7 +34,7 @@ namespace RobotGame.Systems
         public void Update(World entities, float delta)
         {
             entities.Query(in Query, (
-                ref Entity entity,
+                Entity entity,
                 ref SpriteComponent sprite,
                 ref SpriteAnimatorComponent animator) =>
             {

@@ -6,41 +6,37 @@ using RobotGame.Components;
 
 namespace RobotGame.Systems
 {
-    public class BulletSystem : ISystem
+    public class GearSystem : ISystem
     {
-        public const float Speed = 100.0f;
-
-        public Vector2 BulletSize = new Vector2(8.0f, 8.0f);
-
-        public SpriteAnimation FlashAnimation;
+        public SpriteAnimation TurnAnimation;
 
         public RobotGame Game;
         public QueryDescription Query;
 
-        public BulletSystem(RobotGame game)
+        public GearSystem(RobotGame game)
         {
             Game = game;
 
             Query = new QueryDescription().WithAll<
-                BulletComponent,
+                GearComponent,
                 PositionComponent,
-                PhysicsBodyComponent,
+                CollectibleComponent,
                 SpriteComponent,
                 SpriteAnimatorComponent>();
         }
 
-        // Spawns a new bullet
-        public Entity CreateBullet(World entities, Vector2 position, Vector2 direction)
+        // Spawns a new gear
+        public Entity CreateGear(World entities, Vector2 position)
         {
             Entity entity = entities.Create(
-                new BulletComponent(),
+                new GearComponent(),
                 new PositionComponent { Position = position },
-                new PhysicsBodyComponent { Size = BulletSize, Velocity = direction * Speed },
-                new SpriteComponent { Texture = Game.Renderer.PlayerBulletTexture },
+                new CollectibleComponent { },
+                new SpriteComponent { Texture = Game.Renderer.GearTexture },
                 new SpriteAnimatorComponent());
 
             // Start with flashing animation
-            SpriteAnimatorSystem.PlayAnimation(ref entity.Get<SpriteAnimatorComponent>(), FlashAnimation);
+            SpriteAnimatorSystem.PlayAnimation(ref entity.Get<SpriteAnimatorComponent>(), TurnAnimation);
 
             return entity;
         }
@@ -48,15 +44,15 @@ namespace RobotGame.Systems
         public void Initialize()
         {
             // Create animation
-            Texture2D texture = Game.Renderer.PlayerBulletTexture;
+            Texture2D texture = Game.Renderer.GearTexture;
 
-            FlashAnimation = new SpriteAnimation(
+            TurnAnimation = new SpriteAnimation(
                 SpriteAnimation.GetFrames(texture, 2), 10.0f);
         }
 
         public void Update(World entities, float delta)
         {
-            
+
         }
     }
 }

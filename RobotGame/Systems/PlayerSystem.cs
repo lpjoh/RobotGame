@@ -14,6 +14,7 @@ namespace RobotGame.Systems
         public ref PlayerComponent Player;
         public ref PositionComponent Position;
         public ref PhysicsBodyComponent Body;
+        public ref HealthComponent Health;
         public ref SpriteComponent Sprite;
         public ref SpriteAnimatorComponent SpriteAnimator;
     }
@@ -23,12 +24,12 @@ namespace RobotGame.Systems
         public const float Acceleration = 400.0f;
         public const float MaxSpeed = 60.0f;
         public const float ShootTime = 0.2f;
+        public const int MaxHealth = 4;
 
         public SpriteAnimation IdleAnimation, WalkAnimation;
 
-        public QueryDescription Query;
-
         public RobotGame Game;
+        public QueryDescription Query;
 
         public PlayerSystem(RobotGame game)
         {
@@ -38,6 +39,7 @@ namespace RobotGame.Systems
                 PlayerComponent,
                 PositionComponent,
                 PhysicsBodyComponent,
+                HealthComponent,
                 SpriteComponent,
                 SpriteAnimatorComponent>();
         }
@@ -49,6 +51,7 @@ namespace RobotGame.Systems
                 new PlayerComponent { FacingDirection = new Vector2(0, 1) },
                 new PositionComponent { Position = new Vector2(0, 0) },
                 new PhysicsBodyComponent { Size = new Vector2(16, 16) },
+                new HealthComponent() { Health = MaxHealth - 1, MaxHealth = MaxHealth },
                 new SpriteComponent { Texture = Game.Renderer.PlayerDownTexture },
                 new SpriteAnimatorComponent());
 
@@ -198,10 +201,11 @@ namespace RobotGame.Systems
         public void Update(World entities, float delta)
         {
             entities.Query(in Query, (
-                ref Entity entity,
+                Entity entity,
                 ref PlayerComponent player,
                 ref PositionComponent position,
                 ref PhysicsBodyComponent body,
+                ref HealthComponent health,
                 ref SpriteComponent sprite,
                 ref SpriteAnimatorComponent spriteAnimator) =>
             {
@@ -211,6 +215,7 @@ namespace RobotGame.Systems
                     Player = ref player,
                     Position = ref position,
                     Body = ref body,
+                    Health = ref health,
                     Sprite = ref sprite,
                     SpriteAnimator = ref spriteAnimator
                 };

@@ -9,9 +9,8 @@ namespace RobotGame.Systems
     {
         public Texture2D RectTexture;
 
-        public QueryDescription Query;
-
         public Renderer Renderer;
+        public QueryDescription Query;
 
         public PhysicsBodyRendererSystem(Renderer renderer)
         {
@@ -23,7 +22,7 @@ namespace RobotGame.Systems
         public void Draw(World entities, Renderer renderer)
         {
             entities.Query(in Query, (
-                ref Entity entity,
+                Entity entity,
                 ref PhysicsBodyComponent body,
                 ref PositionComponent position) =>
             {

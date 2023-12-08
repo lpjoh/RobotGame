@@ -20,6 +20,8 @@ namespace RobotGame
         public SpriteBatch SpriteBatch;
 
         public Texture2D
+            BackgroundTexture,
+
             PlayerUpTexture,
             PlayerDownTexture,
             PlayerLeftTexture,
@@ -28,9 +30,11 @@ namespace RobotGame
             PlayerBulletTexture,
             EnemyBulletTexture,
 
+            BatteryTexture,
+            GearTexture,
+
             HealthBackTexture,
             HealthFrontTexture;
-
 
         public SpriteSystem SpriteSystem = new();
         public SpriteAnimatorSystem SpriteAnimatorSystem = new();
@@ -51,8 +55,12 @@ namespace RobotGame
 
             SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
+            SpriteBatch.Draw(BackgroundTexture, Vector2.Zero, Color.White);
+
             SpriteSystem.Draw(entities, this);
             //PhysicsBodyRendererSystem.Draw(entities, this);
+
+            Game.World.HealthBar.Draw(this);
 
             SpriteBatch.End();
         }
@@ -88,6 +96,8 @@ namespace RobotGame
             ContentManager content = Game.Content;
 
             // Load textures
+            BackgroundTexture = content.Load<Texture2D>("Textures/background");
+
             PlayerUpTexture = content.Load<Texture2D>("Textures/player_up");
             PlayerDownTexture = content.Load<Texture2D>("Textures/player_down");
             PlayerLeftTexture = content.Load<Texture2D>("Textures/player_left");
@@ -96,8 +106,11 @@ namespace RobotGame
             PlayerBulletTexture = content.Load<Texture2D>("Textures/player_bullet");
             EnemyBulletTexture = content.Load<Texture2D>("Textures/enemy_bullet");
 
+            BatteryTexture = content.Load<Texture2D>("Textures/battery");
+            GearTexture = content.Load<Texture2D>("Textures/gear");
+
             HealthBackTexture = content.Load<Texture2D>("Textures/health_back");
-            HealthFrontTexture = content.Load<Texture2D>("Textures/health_back");
+            HealthFrontTexture = content.Load<Texture2D>("Textures/health_front");
         }
 
         public void Update(float delta)
