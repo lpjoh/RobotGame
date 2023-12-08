@@ -25,7 +25,12 @@ namespace RobotGame
             PlayerLeftTexture,
             PlayerRightTexture,
 
-            PlayerBulletTexture;
+            PlayerBulletTexture,
+            EnemyBulletTexture,
+
+            HealthBackTexture,
+            HealthFrontTexture;
+
 
         public SpriteSystem SpriteSystem = new();
         public SpriteAnimatorSystem SpriteAnimatorSystem = new();
@@ -39,6 +44,7 @@ namespace RobotGame
             PhysicsBodyRendererSystem = new PhysicsBodyRendererSystem(this);
         }
 
+        // Draws the game world
         public void DrawWorld()
         {
             World entities = Game.World.Entities;
@@ -53,22 +59,27 @@ namespace RobotGame
 
         public void Initialize()
         {
+            // Get graphics objects from game
             Graphics = Game.Graphics;
             GraphicsDevice = Game.GraphicsDevice;
 
+            // Set window resolution
             Graphics.PreferredBackBufferWidth = 240 * 3;
             Graphics.PreferredBackBufferHeight = 180 * 3;
 
             Graphics.ApplyChanges();
 
+            // Create viewport
             RenderTarget = new RenderTarget2D(GraphicsDevice, 240, 180);
 
+            // Span viewport rect across entire screen
             RenderTargetRect = new Rectangle(0, 0,
                 Graphics.PreferredBackBufferWidth,
                 Graphics.PreferredBackBufferHeight);
 
             SpriteBatch = new SpriteBatch(GraphicsDevice);
 
+            // Start debug renderer
             PhysicsBodyRendererSystem.Initialize();
         }
 
@@ -76,12 +87,17 @@ namespace RobotGame
         {
             ContentManager content = Game.Content;
 
+            // Load textures
             PlayerUpTexture = content.Load<Texture2D>("Textures/player_up");
             PlayerDownTexture = content.Load<Texture2D>("Textures/player_down");
             PlayerLeftTexture = content.Load<Texture2D>("Textures/player_left");
             PlayerRightTexture = content.Load<Texture2D>("Textures/player_right");
 
             PlayerBulletTexture = content.Load<Texture2D>("Textures/player_bullet");
+            EnemyBulletTexture = content.Load<Texture2D>("Textures/enemy_bullet");
+
+            HealthBackTexture = content.Load<Texture2D>("Textures/health_back");
+            HealthFrontTexture = content.Load<Texture2D>("Textures/health_back");
         }
 
         public void Update(float delta)
@@ -93,14 +109,17 @@ namespace RobotGame
 
         public void Draw()
         {
+            // Draw to viewport
             GraphicsDevice.SetRenderTarget(RenderTarget);
             GraphicsDevice.Clear(Color.Black);
 
             DrawWorld();
 
+            // Draw to main window
             GraphicsDevice.SetRenderTarget(null);
             GraphicsDevice.Clear(Color.Black);
 
+            // Put viewport to screen
             SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
             SpriteBatch.Draw(RenderTarget, RenderTargetRect, Color.White);
             SpriteBatch.End();

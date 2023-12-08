@@ -22,6 +22,7 @@ namespace RobotGame.Systems
     {
         public const float Acceleration = 400.0f;
         public const float MaxSpeed = 60.0f;
+        public const float ShootTime = 0.2f;
 
         public SpriteAnimation IdleAnimation, WalkAnimation;
 
@@ -41,6 +42,7 @@ namespace RobotGame.Systems
                 SpriteAnimatorComponent>();
         }
 
+        // Spawns a new player
         public Entity CreatePlayer(World entities)
         {
             Entity entity = entities.Create(
@@ -50,6 +52,7 @@ namespace RobotGame.Systems
                 new SpriteComponent { Texture = Game.Renderer.PlayerDownTexture },
                 new SpriteAnimatorComponent());
 
+            // Start with idle animation
             SpriteAnimatorSystem.PlayAnimation(ref entity.Get<SpriteAnimatorComponent>(), IdleAnimation);
 
             return entity;
@@ -59,9 +62,11 @@ namespace RobotGame.Systems
         {
             if (direction.Y == 0.0f)
             {
+                // Return left or right
                 return new Vector2(direction.X, 0.0f);
             }
 
+            // Return up or down
             return new Vector2(0.0f, direction.Y);
         }
 
@@ -71,6 +76,7 @@ namespace RobotGame.Systems
 
             if (direction.Y == 0.0f)
             {
+                // Return left or right
                 if (direction.X < 0.0f)
                 {
                     return renderer.PlayerLeftTexture;
@@ -79,6 +85,7 @@ namespace RobotGame.Systems
                 return renderer.PlayerRightTexture;
             }
 
+            // Return up or down
             if (direction.Y < 0.0f)
             {
                 return renderer.PlayerUpTexture;
@@ -91,6 +98,7 @@ namespace RobotGame.Systems
         {
             if (moveDirection == 0.0f)
             {
+                // Decelerate by slowing towards zero
                 float velocityChange = Acceleration * delta;
 
                 if (velocity < 0.0f)
@@ -102,6 +110,7 @@ namespace RobotGame.Systems
             }
             else
             {
+                // Accelerate with maximum speed
                 float newVelocity = velocity + Acceleration * moveDirection * delta;
                 return Math.Clamp(newVelocity, -MaxSpeed, MaxSpeed);
             }
@@ -109,6 +118,7 @@ namespace RobotGame.Systems
 
         public void Move(ref PlayerData playerData, Vector2 moveDirection, float delta)
         {
+            // Move across both axes
             playerData.Body.Velocity.X =
                 ApplyMovement(playerData.Body.Velocity.X, moveDirection.X, delta);
 
@@ -122,10 +132,13 @@ namespace RobotGame.Systems
             Vector2 shootDirection,
             float delta)
         {
+            // Check shoot timer is finished
             if (playerData.Player.ShootTimer <= 0)
             {
+                // Check if shooting in a direction
                 if (shootDirection != Vector2.Zero)
                 {
+                    // Summon bullet centered on the player's hitbox
                     BulletSystem bulletSystem = Game.World.BulletSystem;
 
                     Vector2 bulletPosition =
@@ -135,11 +148,13 @@ namespace RobotGame.Systems
                     bulletSystem.CreateBullet(
                         entities, bulletPosition, shootDirection);
 
-                    playerData.Player.ShootTimer = 0.2f;
+                    // Reset shoot timer
+                    playerData.Player.ShootTimer = ShootTime;
                 }
             }
             else
             {
+                // Advance shoot timer
                 playerData.Player.ShootTimer -= delta;
             }
         }
@@ -148,22 +163,27 @@ namespace RobotGame.Systems
         {
             if (moveDirection == Vector2.Zero)
             {
+                // Show idle animation
                 SpriteAnimatorSystem.PlayAnimation(ref playerData.SpriteAnimator, IdleAnimation);
             }
             else
             {
+                // Check if movement is facing away from current direction
                 if (Vector2.Dot(playerData.Player.FacingDirection, moveDirection) <= 0.0)
                 {
+                    // Change sprite direction
                     playerData.Player.FacingDirection = GetFacingDirection(moveDirection);
                     playerData.Sprite.Texture = GetFacingTexture(playerData.Player.FacingDirection);
                 }
 
+                // Play walking animation
                 SpriteAnimatorSystem.PlayAnimation(ref playerData.SpriteAnimator, WalkAnimation);
             }
         }
 
         public void Initialize()
         {
+            // Create animations
             Texture2D texture = Game.Renderer.PlayerDownTexture;
 
             List<Rectangle>
@@ -185,6 +205,7 @@ namespace RobotGame.Systems
                 ref SpriteComponent sprite,
                 ref SpriteAnimatorComponent spriteAnimator) =>
             {
+                // Pack component references into struct
                 PlayerData playerData = new()
                 {
                     Player = ref player,
@@ -194,11 +215,13 @@ namespace RobotGame.Systems
                     SpriteAnimator = ref spriteAnimator
                 };
 
+                // Obtain input variables
                 Input input = Game.Input;
 
                 Vector2 moveDirection = input.GetAxis(Keys.W, Keys.S, Keys.A, Keys.D);
                 Vector2 shootDirection = input.GetAxis(Keys.Up, Keys.Down, Keys.Left, Keys.Right);
 
+                // Perform actions
                 Move(ref playerData, moveDirection, delta);
                 Shoot(ref playerData, entities, shootDirection, delta);
                 Animate(ref playerData, moveDirection);

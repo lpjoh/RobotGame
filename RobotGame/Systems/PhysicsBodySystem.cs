@@ -12,6 +12,11 @@ namespace RobotGame.Systems
             Query = new QueryDescription().WithAll<PhysicsBodyComponent, PositionComponent>();
         }
 
+        public void Initialize()
+        {
+
+        }
+
         public void Update(World entities, float delta)
         {
             entities.Query(in Query, (
@@ -19,6 +24,7 @@ namespace RobotGame.Systems
                 ref PhysicsBodyComponent body,
                 ref PositionComponent position) =>
             {
+                // Move body by velocity
                 position.Position += body.Velocity * delta;
             });
         }

@@ -30,6 +30,7 @@ namespace RobotGame.Systems
                 SpriteAnimatorComponent>();
         }
 
+        // Spawns a new bullet
         public Entity CreateBullet(World entities, Vector2 position, Vector2 direction)
         {
             Entity entity = entities.Create(
@@ -39,6 +40,7 @@ namespace RobotGame.Systems
                 new SpriteComponent { Texture = Game.Renderer.PlayerBulletTexture },
                 new SpriteAnimatorComponent());
 
+            // Start with flashing animation
             SpriteAnimatorSystem.PlayAnimation(ref entity.Get<SpriteAnimatorComponent>(), FlashAnimation);
 
             return entity;
@@ -47,6 +49,7 @@ namespace RobotGame.Systems
         public void Initialize()
         {
             Texture2D texture = Game.Renderer.PlayerBulletTexture;
+
             FlashAnimation = new SpriteAnimation(
                 SpriteAnimation.GetFrames(texture, 2), 10.0f);
         }

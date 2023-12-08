@@ -27,6 +27,7 @@ namespace RobotGame.Systems
                 ref PhysicsBodyComponent body,
                 ref PositionComponent position) =>
             {
+                // Draw bounding box of physics body
                 Rectangle entityRect = new Rectangle(
                     (int)position.Position.X,
                     (int)position.Position.Y,
@@ -39,6 +40,7 @@ namespace RobotGame.Systems
 
         public void Initialize()
         {
+            // Create 1x1 texture to represent hitboxes
             RectTexture = new Texture2D(Renderer.GraphicsDevice, 1, 1);
             RectTexture.SetData(new[] { new Color(Color.Red, 0.1f) });
         }

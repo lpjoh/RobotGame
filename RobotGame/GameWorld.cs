@@ -1,6 +1,4 @@
 ﻿using Arch.Core;
-using RobotGame.Components;
-using Microsoft.Xna.Framework;
 using RobotGame.Systems;
 using System.Collections.Generic;
 
@@ -24,6 +22,7 @@ namespace RobotGame
         {
             Game = game;
 
+            // Create systems
             PhysicsBodySystem = new PhysicsBodySystem();
             Systems.Add(PhysicsBodySystem);
 
@@ -38,14 +37,18 @@ namespace RobotGame
         {
             Entities = World.Create();
 
-            PlayerSystem.Initialize();
-            BulletSystem.Initialize();
+            // Start each system by interface
+            foreach (ISystem system in Systems)
+            {
+                system.Initialize();
+            }
 
             Player = PlayerSystem.CreatePlayer(Entities);
         }
 
         public void Update(float delta)
         {
+            // Update each system by interface
             foreach (ISystem system in Systems)
             {
                 system.Update(Entities, delta);

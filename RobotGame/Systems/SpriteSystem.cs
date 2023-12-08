@@ -20,9 +20,15 @@ namespace RobotGame.Systems
                 ref SpriteComponent sprite,
                 ref PositionComponent position) =>
             {
+                // Draw sprite
                 renderer.SpriteBatch.Draw(
                     sprite.Texture, position.Position, sprite.Frame, Color.White);
             });
+        }
+
+        public void Initialize()
+        {
+
         }
 
         public void Update(World entities, float delta)
