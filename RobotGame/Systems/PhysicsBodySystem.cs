@@ -12,7 +12,7 @@ namespace RobotGame.Systems
             Query = new QueryDescription().WithAll<PhysicsBodyComponent, PositionComponent>();
         }
 
-        public static GameRect GetGameRect(PhysicsBodyComponent body, PositionComponent position)
+        public static GameRect GetRect(PhysicsBodyComponent body, PositionComponent position)
         {
             return new GameRect(position.Position, body.Size);
         }

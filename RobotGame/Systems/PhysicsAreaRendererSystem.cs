@@ -25,8 +25,11 @@ namespace RobotGame.Systems
                 ref PhysicsAreaComponent area,
                 ref PositionComponent position) =>
             {
-                // Draw bounding box of body
-                RectRenderer.DrawRect(renderer, PhysicsAreaSystem.GetGameRect(area, position));
+                // Draw every bounding box of area
+                for (int i = 0; i < area.Rects.Length; i++)
+                {
+                    RectRenderer.DrawRect(renderer, PhysicsAreaSystem.GetRect(area, position, i));
+                }
             });
         }
 

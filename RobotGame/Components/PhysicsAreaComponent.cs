@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
 
 namespace RobotGame.Components
 {
     public struct PhysicsAreaComponent
     {
-        public Vector2 Size;
-        public Vector2 Offset;
+        public GameRect[] Rects;
+        public List<PhysicsAreaCollision> Collisions;
     }
 }

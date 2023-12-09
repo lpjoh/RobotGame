@@ -1,6 +1,5 @@
 ﻿using Arch.Core;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using RobotGame.Components;
 
 namespace RobotGame.Systems
@@ -27,7 +26,7 @@ namespace RobotGame.Systems
                 ref PositionComponent position) =>
             {
                 // Draw bounding box of body
-                RectRenderer.DrawRect(renderer, PhysicsBodySystem.GetGameRect(body, position));
+                RectRenderer.DrawRect(renderer, PhysicsBodySystem.GetRect(body, position));
             });
         }
 

@@ -23,10 +23,11 @@ namespace RobotGame.Systems
     public class PlayerSystem : ISystem
     {
         public Vector2 BodySize = new(8.0f, 8.0f);
+        public Vector2 SpriteOffset = new(-4.0f, -7.0f);
+
         public Vector2 AreaSize = new(12.0f, 12.0f);
 
-        public Vector2 SpriteOffset = new(-4.0f, -7.0f);
-        public Vector2 AreaOffset;
+        public GameRect[] AreaRects;
 
         public const float Acceleration = 400.0f;
         public const float MaxSpeed = 60.0f;
@@ -52,7 +53,10 @@ namespace RobotGame.Systems
                 SpriteAnimatorComponent>();
 
             // Center area relative to body
-            AreaOffset = (BodySize - AreaSize) / 2.0f;
+            AreaRects = new GameRect[]
+            {
+                new GameRect((BodySize - AreaSize) * 0.5f, AreaSize)
+            };
         }
 
         // Spawns a new player
@@ -62,7 +66,7 @@ namespace RobotGame.Systems
                 new PlayerComponent { FacingDirection = new Vector2(0.0f, 1.0f) },
                 new PositionComponent { Position = new Vector2(0.0f, 0.0f) },
                 new PhysicsBodyComponent { Size = BodySize },
-                new PhysicsAreaComponent { Size = AreaSize, Offset = AreaOffset },
+                new PhysicsAreaComponent { Rects = AreaRects },
                 new HealthComponent() { Health = MaxHealth - 1, MaxHealth = MaxHealth },
                 new SpriteComponent { Texture = Game.Renderer.PlayerDownTexture, Offset = SpriteOffset },
                 new SpriteAnimatorComponent());
@@ -148,7 +152,7 @@ namespace RobotGame.Systems
             float delta)
         {
             // Check shoot timer is finished
-            if (playerData.Player.ShootTimer <= 0)
+            if (playerData.Player.ShootTimer <= 0.0f)
             {
                 // Check if shooting in a direction
                 if (shootDirection != Vector2.Zero)
@@ -158,7 +162,7 @@ namespace RobotGame.Systems
 
                     Vector2 bulletPosition =
                         playerData.Position.Position +
-                        (playerData.Body.Size - bulletSystem.BulletSize) * 0.5f;
+                        (playerData.Body.Size - bulletSystem.BodySize) * 0.5f;
 
                     bulletSystem.CreateBullet(
                         entities, bulletPosition, shootDirection);
@@ -228,6 +232,7 @@ namespace RobotGame.Systems
                     Player = ref player,
                     Position = ref position,
                     Body = ref body,
+                    Area = ref area,
                     Health = ref health,
                     Sprite = ref sprite,
                     SpriteAnimator = ref spriteAnimator

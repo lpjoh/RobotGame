@@ -10,7 +10,7 @@ namespace RobotGame.Systems
     {
         public const float Speed = 100.0f;
 
-        public Vector2 BulletSize = new Vector2(8.0f, 8.0f);
+        public Vector2 BodySize = new Vector2(8.0f, 8.0f);
 
         public SpriteAnimation FlashAnimation;
 
@@ -35,7 +35,7 @@ namespace RobotGame.Systems
             Entity entity = entities.Create(
                 new BulletComponent(),
                 new PositionComponent { Position = position },
-                new PhysicsBodyComponent { Size = BulletSize, Velocity = direction * Speed },
+                new PhysicsBodyComponent { Size = BodySize, Velocity = direction * Speed },
                 new SpriteComponent { Texture = Game.Renderer.PlayerBulletTexture },
                 new SpriteAnimatorComponent());
 
