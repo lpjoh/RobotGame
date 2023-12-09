@@ -7,5 +7,6 @@ namespace RobotGame.Components
     {
         public Texture2D Texture;
         public Rectangle Frame;
+        public Vector2 Offset;
     }
 }

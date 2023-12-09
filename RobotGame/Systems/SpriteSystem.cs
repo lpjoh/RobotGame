@@ -13,7 +13,7 @@ namespace RobotGame.Systems
             Query = new QueryDescription().WithAll<SpriteComponent, PositionComponent>();
         }
 
-        public void Draw(World entities, Renderer renderer)
+        public void Draw(Renderer renderer, World entities)
         {
             entities.Query(in Query, (
                 Entity entity,
@@ -22,7 +22,7 @@ namespace RobotGame.Systems
             {
                 // Draw sprite
                 renderer.SpriteBatch.Draw(
-                    sprite.Texture, position.Position, sprite.Frame, Color.White);
+                    sprite.Texture, position.Position + sprite.Offset, sprite.Frame, Color.White);
             });
         }
 

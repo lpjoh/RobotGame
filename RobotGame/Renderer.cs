@@ -1,11 +1,8 @@
 ﻿using Arch.Core;
-using Arch.Core.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using RobotGame.Components;
 using RobotGame.Systems;
-using System.Collections.Generic;
 
 namespace RobotGame
 {
@@ -39,13 +36,22 @@ namespace RobotGame
         public SpriteSystem SpriteSystem = new();
         public SpriteAnimatorSystem SpriteAnimatorSystem = new();
         public PhysicsBodyRendererSystem PhysicsBodyRendererSystem;
+        public PhysicsAreaRendererSystem PhysicsAreaRendererSystem;
 
         public RobotGame Game;
 
         public Renderer(RobotGame game)
         {
             Game = game;
-            PhysicsBodyRendererSystem = new PhysicsBodyRendererSystem(this);
+        }
+
+        // Draws debug info
+        public void DrawDebug()
+        {
+            World entities = Game.World.Entities;
+
+            PhysicsBodyRendererSystem.Draw(this, entities);
+            PhysicsAreaRendererSystem.Draw(this, entities);
         }
 
         // Draws the game world
@@ -57,10 +63,10 @@ namespace RobotGame
 
             SpriteBatch.Draw(BackgroundTexture, Vector2.Zero, Color.White);
 
-            SpriteSystem.Draw(entities, this);
-            //PhysicsBodyRendererSystem.Draw(entities, this);
-
+            SpriteSystem.Draw(this, entities);
             Game.World.HealthBar.Draw(this);
+
+            DrawDebug();
 
             SpriteBatch.End();
         }
@@ -87,8 +93,18 @@ namespace RobotGame
 
             SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // Start debug renderer
-            PhysicsBodyRendererSystem.Initialize();
+            // Add systems
+            SpriteSystem = new SpriteSystem();
+
+            SpriteAnimatorSystem = new SpriteAnimatorSystem();
+            Game.World.Systems.Add(SpriteAnimatorSystem);
+
+            // Add debug systems
+            PhysicsBodyRendererSystem = new PhysicsBodyRendererSystem(this);
+            Game.World.Systems.Add(PhysicsBodyRendererSystem);
+
+            PhysicsAreaRendererSystem = new PhysicsAreaRendererSystem(this);
+            Game.World.Systems.Add(PhysicsAreaRendererSystem);
         }
 
         public void LoadContent()
@@ -116,8 +132,6 @@ namespace RobotGame
         public void Update(float delta)
         {
             World entities = Game.World.Entities;
-
-            SpriteAnimatorSystem.Update(entities, delta);
         }
 
         public void Draw()

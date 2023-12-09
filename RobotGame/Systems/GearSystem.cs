@@ -8,6 +8,8 @@ namespace RobotGame.Systems
 {
     public class GearSystem : ISystem
     {
+        public Vector2 GearSize = new(16.0f, 16.0f);
+
         public SpriteAnimation TurnAnimation;
 
         public RobotGame Game;
@@ -20,7 +22,7 @@ namespace RobotGame.Systems
             Query = new QueryDescription().WithAll<
                 GearComponent,
                 PositionComponent,
-                CollectibleComponent,
+                PhysicsAreaComponent,
                 SpriteComponent,
                 SpriteAnimatorComponent>();
         }
@@ -31,7 +33,7 @@ namespace RobotGame.Systems
             Entity entity = entities.Create(
                 new GearComponent(),
                 new PositionComponent { Position = position },
-                new CollectibleComponent { },
+                new PhysicsAreaComponent { Size = GearSize },
                 new SpriteComponent { Texture = Game.Renderer.GearTexture },
                 new SpriteAnimatorComponent());
 

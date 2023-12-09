@@ -14,6 +14,7 @@ namespace RobotGame.Systems
         public ref PlayerComponent Player;
         public ref PositionComponent Position;
         public ref PhysicsBodyComponent Body;
+        public ref PhysicsAreaComponent Area;
         public ref HealthComponent Health;
         public ref SpriteComponent Sprite;
         public ref SpriteAnimatorComponent SpriteAnimator;
@@ -21,6 +22,12 @@ namespace RobotGame.Systems
 
     public class PlayerSystem : ISystem
     {
+        public Vector2 BodySize = new(8.0f, 8.0f);
+        public Vector2 AreaSize = new(12.0f, 12.0f);
+
+        public Vector2 SpriteOffset = new(-4.0f, -7.0f);
+        public Vector2 AreaOffset;
+
         public const float Acceleration = 400.0f;
         public const float MaxSpeed = 60.0f;
         public const float ShootTime = 0.2f;
@@ -39,20 +46,25 @@ namespace RobotGame.Systems
                 PlayerComponent,
                 PositionComponent,
                 PhysicsBodyComponent,
+                PhysicsAreaComponent,
                 HealthComponent,
                 SpriteComponent,
                 SpriteAnimatorComponent>();
+
+            // Center area relative to body
+            AreaOffset = (BodySize - AreaSize) / 2.0f;
         }
 
         // Spawns a new player
         public Entity CreatePlayer(World entities)
         {
             Entity entity = entities.Create(
-                new PlayerComponent { FacingDirection = new Vector2(0, 1) },
-                new PositionComponent { Position = new Vector2(0, 0) },
-                new PhysicsBodyComponent { Size = new Vector2(16, 16) },
+                new PlayerComponent { FacingDirection = new Vector2(0.0f, 1.0f) },
+                new PositionComponent { Position = new Vector2(0.0f, 0.0f) },
+                new PhysicsBodyComponent { Size = BodySize },
+                new PhysicsAreaComponent { Size = AreaSize, Offset = AreaOffset },
                 new HealthComponent() { Health = MaxHealth - 1, MaxHealth = MaxHealth },
-                new SpriteComponent { Texture = Game.Renderer.PlayerDownTexture },
+                new SpriteComponent { Texture = Game.Renderer.PlayerDownTexture, Offset = SpriteOffset },
                 new SpriteAnimatorComponent());
 
             // Start with idle animation
@@ -205,6 +217,7 @@ namespace RobotGame.Systems
                 ref PlayerComponent player,
                 ref PositionComponent position,
                 ref PhysicsBodyComponent body,
+                ref PhysicsAreaComponent area,
                 ref HealthComponent health,
                 ref SpriteComponent sprite,
                 ref SpriteAnimatorComponent spriteAnimator) =>

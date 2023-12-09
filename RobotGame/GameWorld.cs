@@ -14,6 +14,8 @@ namespace RobotGame
         public RobotGame Game;
 
         public PhysicsBodySystem PhysicsBodySystem;
+        public PhysicsAreaSystem PhysicsAreaSystem;
+
         public PlayerSystem PlayerSystem;
         public BulletSystem BulletSystem;
         public GearSystem GearSystem;
@@ -29,6 +31,9 @@ namespace RobotGame
             // Create systems
             PhysicsBodySystem = new PhysicsBodySystem();
             Systems.Add(PhysicsBodySystem);
+
+            PhysicsAreaSystem = new PhysicsAreaSystem();
+            Systems.Add(PhysicsAreaSystem);
 
             PlayerSystem = new PlayerSystem(Game);
             Systems.Add(PlayerSystem);
