@@ -29,7 +29,7 @@ namespace RobotGame
 
             // Get ratio between player's health and max health
             HealthComponent health = Game.World.Player.Get<HealthComponent>();
-            float healthRatio = health.Health / (float)health.MaxHealth;
+            float healthRatio = health.Value / (float)health.MaxValue;
 
             // Scale rect by ratio, with ceiling to fill entire space
             Vector2 frontSize = new(frontTexture.Width, MathF.Ceiling(frontTexture.Height * healthRatio));

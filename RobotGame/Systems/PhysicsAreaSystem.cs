@@ -22,19 +22,6 @@ namespace RobotGame.Systems
             return new GameRect(position.Position + rect.Position, rect.Size);
         }
 
-        // Creates or empties collisions in an area
-        public static void ResetCollisions(ref PhysicsAreaComponent area)
-        {
-            if (area.Collisions == null)
-            {
-                area.Collisions = new List<PhysicsAreaCollision>();
-            }
-            else
-            {
-                area.Collisions.Clear();
-            }
-        }
-
         public void Initialize()
         {
 
@@ -54,7 +41,7 @@ namespace RobotGame.Systems
                 ref PhysicsAreaComponent area1 = ref entity1.Get<PhysicsAreaComponent>();
                 ref PositionComponent position1 = ref entity1.Get<PositionComponent>();
 
-                ResetCollisions(ref area1);
+                area1.Collisions.Clear();
 
                 for (int ei2 = 0; ei2 < areaEntities.Count; ei2++)
                 {
@@ -69,7 +56,7 @@ namespace RobotGame.Systems
                     ref PhysicsAreaComponent area2 = ref entity2.Get<PhysicsAreaComponent>();
                     ref PositionComponent position2 = ref entity2.Get<PositionComponent>();
 
-                    ResetCollisions(ref area2);
+                    area2.Collisions.Clear();
 
                     // Test every rect against every other
                     for (int ri1 = 0; ri1 < area1.Rects.Length; ri1++)

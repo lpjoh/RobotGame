@@ -27,6 +27,8 @@ namespace RobotGame
             PlayerBulletTexture,
             EnemyBulletTexture,
 
+            AlienEnemyTexture,
+
             BatteryTexture,
             GearTexture,
 
@@ -70,7 +72,7 @@ namespace RobotGame
             SpriteSystem.Draw(this, entities);
             Game.World.HealthBar.Draw(this);
 
-            DrawDebug();
+            //DrawDebug();
 
             TextRenderer.DrawText(this, "the quick brown fox jumps over the lazy dog", Vector2.Zero);
 
@@ -127,6 +129,8 @@ namespace RobotGame
 
             PlayerBulletTexture = content.Load<Texture2D>("Textures/player_bullet");
             EnemyBulletTexture = content.Load<Texture2D>("Textures/enemy_bullet");
+
+            AlienEnemyTexture = content.Load<Texture2D>("Textures/alien_enemy");
 
             BatteryTexture = content.Load<Texture2D>("Textures/battery");
             GearTexture = content.Load<Texture2D>("Textures/gear");

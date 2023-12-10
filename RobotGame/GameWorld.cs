@@ -1,7 +1,8 @@
 ﻿using Arch.Core;
 using RobotGame.Systems;
 using System.Collections.Generic;
-using System.Numerics;
+using Microsoft.Xna.Framework;
+using System;
 
 namespace RobotGame
 {
@@ -18,9 +19,16 @@ namespace RobotGame
 
         public PlayerSystem PlayerSystem;
         public BulletSystem BulletSystem;
+
+        public AlienEnemySystem AlienEnemySystem;
+
+        public CollectibleSystem CollectibleSystem;
         public GearSystem GearSystem;
+        public BatterySystem BatterySystem;
 
         public HealthBar HealthBar;
+
+        public Random Random = new();
 
         public Queue<Entity> EntityDestructionQueue = new();
 
@@ -30,22 +38,34 @@ namespace RobotGame
         {
             Game = game;
 
-            // Create systems
+            // Generic systems
             PhysicsBodySystem = new PhysicsBodySystem();
             Systems.Add(PhysicsBodySystem);
 
             PhysicsAreaSystem = new PhysicsAreaSystem();
             Systems.Add(PhysicsAreaSystem);
 
+            // Main entities
             PlayerSystem = new PlayerSystem(Game);
             Systems.Add(PlayerSystem);
 
             BulletSystem = new BulletSystem(Game);
             Systems.Add(BulletSystem);
 
+            AlienEnemySystem = new AlienEnemySystem(Game);
+            Systems.Add(AlienEnemySystem);
+
+            // Collectibles
+            CollectibleSystem = new CollectibleSystem(Game);
+            Systems.Add(CollectibleSystem);
+
             GearSystem = new GearSystem(Game);
             Systems.Add(GearSystem);
 
+            BatterySystem = new BatterySystem(Game);
+            Systems.Add(BatterySystem);
+
+            // Create health bar
             HealthBar = new HealthBar(Game);
         }
 
@@ -65,9 +85,12 @@ namespace RobotGame
                 system.Initialize();
             }
 
-            Player = PlayerSystem.CreatePlayer(Entities);
+            Player = PlayerSystem.CreatePlayer(Entities, Vector2.Zero);
 
             GearSystem.CreateGear(Entities, Vector2.One * 32.0f);
+            BatterySystem.CreateBattery(Entities, Vector2.One * 64.0f);
+
+            AlienEnemySystem.CreateAlienEnemy(Entities, Vector2.One * 96.0f);
         }
 
         public void Update(float delta)

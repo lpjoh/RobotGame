@@ -6,23 +6,23 @@ using RobotGame.Components;
 
 namespace RobotGame.Systems
 {
-    public class GearSystem : ISystem
+    public class BatterySystem : ISystem
     {
         public Vector2 AreaSize = new(16.0f, 16.0f);
 
         public GameRect[] AreaRects;
 
-        public SpriteAnimation TurnAnimation;
+        public SpriteAnimation FlashAnimation;
 
         public RobotGame Game;
         public QueryDescription Query;
 
-        public GearSystem(RobotGame game)
+        public BatterySystem(RobotGame game)
         {
             Game = game;
 
             Query = new QueryDescription().WithAll<
-                GearComponent,
+                BatteryComponent,
                 PositionComponent,
                 PhysicsAreaComponent,
                 CollectibleComponent,
@@ -30,8 +30,8 @@ namespace RobotGame.Systems
                 SpriteAnimatorComponent>();
         }
 
-        // Spawns a new gear
-        public Entity CreateGear(World entities, Vector2 position)
+        // Spawns a new battery
+        public Entity CreateBattery(World entities, Vector2 position)
         {
             AreaRects = new GameRect[]
             {
@@ -39,15 +39,15 @@ namespace RobotGame.Systems
             };
 
             Entity entity = entities.Create(
-                new GearComponent(),
+                new BatteryComponent(),
                 new PositionComponent { Position = position },
                 new PhysicsAreaComponent { Rects = AreaRects },
                 new CollectibleComponent(),
-                new SpriteComponent { Texture = Game.Renderer.GearTexture },
+                new SpriteComponent { Texture = Game.Renderer.BatteryTexture },
                 new SpriteAnimatorComponent());
 
             // Starting animation
-            SpriteAnimatorSystem.PlayAnimation(ref entity.Get<SpriteAnimatorComponent>(), TurnAnimation);
+            SpriteAnimatorSystem.PlayAnimation(ref entity.Get<SpriteAnimatorComponent>(), FlashAnimation);
 
             return entity;
         }
@@ -55,9 +55,9 @@ namespace RobotGame.Systems
         public void Initialize()
         {
             // Create animation
-            Texture2D texture = Game.Renderer.GearTexture;
+            Texture2D texture = Game.Renderer.BatteryTexture;
 
-            TurnAnimation = new SpriteAnimation(
+            FlashAnimation = new SpriteAnimation(
                 SpriteAnimatorSystem.GetFrames(texture, 2), 10.0f);
         }
 
@@ -65,7 +65,7 @@ namespace RobotGame.Systems
         {
             entities.Query(in Query, (
                 Entity entity,
-                ref GearComponent gear,
+                ref BatteryComponent battery,
                 ref PositionComponent position,
                 ref PhysicsAreaComponent area,
                 ref CollectibleComponent collectible,
@@ -74,6 +74,9 @@ namespace RobotGame.Systems
             {
                 if (collectible.Collected)
                 {
+                    ref HealthComponent playerHealth = ref Game.World.Player.Get<HealthComponent>();
+                    Health.ModifyHealth(ref playerHealth, playerHealth.Value + 1);
+
                     Game.World.CollectibleSystem.CollectEntity(entity);
                 }
             });

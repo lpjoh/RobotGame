@@ -2,6 +2,6 @@
 {
     public struct HealthComponent
     {
-        public int Health, MaxHealth;
+        public int Value, MaxValue;
     }
 }

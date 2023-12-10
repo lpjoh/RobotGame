@@ -1,5 +1,6 @@
 ﻿using Arch.Core;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using RobotGame.Components;
 
 namespace RobotGame.Systems
@@ -20,9 +21,19 @@ namespace RobotGame.Systems
                 ref SpriteComponent sprite,
                 ref PositionComponent position) =>
             {
+                SpriteEffects spriteEffects = sprite.FlipX ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
                 // Draw sprite
                 renderer.SpriteBatch.Draw(
-                    sprite.Texture, position.Position + sprite.Offset, sprite.Frame, Color.White);
+                    sprite.Texture,
+                    position.Position + sprite.Offset,
+                    sprite.Frame,
+                    Color.White,
+                    0.0f,
+                    Vector2.Zero,
+                    Vector2.One,
+                    spriteEffects,
+                    0.0f);
             });
         }
 

@@ -11,6 +11,7 @@ namespace RobotGame.Systems
 {
     public ref struct PlayerData
     {
+        public Entity Entity;
         public ref PlayerComponent Player;
         public ref PositionComponent Position;
         public ref PhysicsBodyComponent Body;
@@ -22,17 +23,17 @@ namespace RobotGame.Systems
 
     public class PlayerSystem : ISystem
     {
+        public const float Acceleration = 400.0f;
+        public const float MaxSpeed = 60.0f;
+        public const float ShootTime = 0.2f;
+        public const int MaxHealth = 4;
+
         public Vector2 BodySize = new(8.0f, 8.0f);
         public Vector2 SpriteOffset = new(-4.0f, -7.0f);
 
         public Vector2 AreaSize = new(12.0f, 12.0f);
 
         public GameRect[] AreaRects;
-
-        public const float Acceleration = 400.0f;
-        public const float MaxSpeed = 60.0f;
-        public const float ShootTime = 0.2f;
-        public const int MaxHealth = 4;
 
         public SpriteAnimation IdleAnimation, WalkAnimation;
 
@@ -60,18 +61,18 @@ namespace RobotGame.Systems
         }
 
         // Spawns a new player
-        public Entity CreatePlayer(World entities)
+        public Entity CreatePlayer(World entities, Vector2 position)
         {
             Entity entity = entities.Create(
                 new PlayerComponent { FacingDirection = new Vector2(0.0f, 1.0f) },
-                new PositionComponent { Position = new Vector2(0.0f, 0.0f) },
+                new PositionComponent { Position = position },
                 new PhysicsBodyComponent { Size = BodySize },
                 new PhysicsAreaComponent { Rects = AreaRects },
-                new HealthComponent() { Health = MaxHealth - 1, MaxHealth = MaxHealth },
+                new HealthComponent() { Value = MaxHealth - 1, MaxValue = MaxHealth },
                 new SpriteComponent { Texture = Game.Renderer.PlayerDownTexture, Offset = SpriteOffset },
                 new SpriteAnimatorComponent());
 
-            // Start with idle animation
+            // Starting animation
             SpriteAnimatorSystem.PlayAnimation(ref entity.Get<SpriteAnimatorComponent>(), IdleAnimation);
 
             return entity;
@@ -161,11 +162,10 @@ namespace RobotGame.Systems
                     BulletSystem bulletSystem = Game.World.BulletSystem;
 
                     Vector2 bulletPosition =
-                        playerData.Position.Position +
-                        (playerData.Body.Size - bulletSystem.BodySize) * 0.5f;
+                        playerData.Position.Position + playerData.Body.Size * 0.5f;
 
                     bulletSystem.CreateBullet(
-                        entities, bulletPosition, shootDirection);
+                        entities, bulletPosition, shootDirection, BulletType.Player);
 
                     // Reset shoot timer
                     playerData.Player.ShootTimer = ShootTime;
@@ -206,7 +206,7 @@ namespace RobotGame.Systems
             Texture2D texture = Game.Renderer.PlayerDownTexture;
 
             List<Rectangle>
-                spriteFrames = SpriteAnimation.GetFrames(texture, 3),
+                spriteFrames = SpriteAnimatorSystem.GetFrames(texture, 3),
                 idleFrames = new() { spriteFrames[0] },
                 walkFrames = new() { spriteFrames[0], spriteFrames[1], spriteFrames[2] };
 
@@ -226,9 +226,10 @@ namespace RobotGame.Systems
                 ref SpriteComponent sprite,
                 ref SpriteAnimatorComponent spriteAnimator) =>
             {
-                // Pack component references into struct
+                // Pack components into struct
                 PlayerData playerData = new()
                 {
+                    Entity = entity,
                     Player = ref player,
                     Position = ref position,
                     Body = ref body,

@@ -6,5 +6,10 @@ namespace RobotGame.Components
     {
         public GameRect[] Rects;
         public List<PhysicsAreaCollision> Collisions;
+
+        public PhysicsAreaComponent()
+        {
+            Collisions = new List<PhysicsAreaCollision>();
+        }
     }
 }
