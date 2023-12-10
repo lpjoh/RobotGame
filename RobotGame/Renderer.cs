@@ -34,6 +34,8 @@ namespace RobotGame
 
             HealthBackTexture,
             HealthFrontTexture,
+
+            GearIconTexture,
             
             FontTexture;
 
@@ -65,16 +67,17 @@ namespace RobotGame
         {
             World entities = Game.World.Entities;
 
-            SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            SpriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend);
 
             SpriteBatch.Draw(BackgroundTexture, Vector2.Zero, Color.White);
 
             SpriteSystem.Draw(this, entities);
+
+            // Draw stat displays
             Game.World.HealthBar.Draw(this);
+            Game.World.GearDisplay.Draw(this);
 
             //DrawDebug();
-
-            TextRenderer.DrawText(this, "the quick brown fox jumps over the lazy dog", Vector2.Zero);
 
             SpriteBatch.End();
         }
@@ -137,6 +140,8 @@ namespace RobotGame
 
             HealthBackTexture = content.Load<Texture2D>("Textures/health_back");
             HealthFrontTexture = content.Load<Texture2D>("Textures/health_front");
+
+            GearIconTexture = content.Load<Texture2D>("Textures/gear_icon");
 
             FontTexture = content.Load<Texture2D>("Textures/font_wide");
 

@@ -26,16 +26,23 @@ namespace RobotGame.Systems
         public const float Acceleration = 400.0f;
         public const float MaxSpeed = 60.0f;
         public const float ShootTime = 0.2f;
+        public const float HurtTime = 1.0f;
         public const int MaxHealth = 4;
+
+        public const int CollectRectIndex = 0, HurtRectIndex = 1;
 
         public Vector2 BodySize = new(8.0f, 8.0f);
         public Vector2 SpriteOffset = new(-4.0f, -7.0f);
 
-        public Vector2 AreaSize = new(12.0f, 12.0f);
+        public Vector2
+            CollectAreaSize = new(12.0f, 12.0f),
+            HurtAreaSize = new(6.0f, 6.0f);
 
         public GameRect[] AreaRects;
 
         public SpriteAnimation IdleAnimation, WalkAnimation;
+
+        public Color HurtColor = Color.Red;
 
         public RobotGame Game;
         public QueryDescription Query;
@@ -53,10 +60,11 @@ namespace RobotGame.Systems
                 SpriteComponent,
                 SpriteAnimatorComponent>();
 
-            // Center area relative to body
+            // Create area rects
             AreaRects = new GameRect[]
             {
-                new GameRect((BodySize - AreaSize) * 0.5f, AreaSize)
+                new GameRect((BodySize - CollectAreaSize) * 0.5f, CollectAreaSize), // Collect rect
+                new GameRect((BodySize - HurtAreaSize) * 0.5f, HurtAreaSize) // Hurt rect
             };
         }
 
@@ -65,10 +73,10 @@ namespace RobotGame.Systems
         {
             Entity entity = entities.Create(
                 new PlayerComponent { FacingDirection = new Vector2(0.0f, 1.0f) },
-                new PositionComponent { Position = position },
+                new PositionComponent { Position = position - BodySize * 0.5f },
                 new PhysicsBodyComponent { Size = BodySize },
                 new PhysicsAreaComponent { Rects = AreaRects },
-                new HealthComponent() { Value = MaxHealth - 1, MaxValue = MaxHealth },
+                new HealthComponent() { Value = MaxHealth, MaxValue = MaxHealth },
                 new SpriteComponent { Texture = Game.Renderer.PlayerDownTexture, Offset = SpriteOffset },
                 new SpriteAnimatorComponent());
 
@@ -78,7 +86,52 @@ namespace RobotGame.Systems
             return entity;
         }
 
-        public Vector2 GetFacingDirection(Vector2 direction)
+        // Damages a player by an amount
+        public void DamagePlayer(Entity entity, int amount)
+        {
+            ref PlayerComponent player = ref entity.Get<PlayerComponent>();
+
+            // Skip if hurt timer still active
+            if (player.HurtTimer > 0.0f)
+            {
+                return;
+            }
+
+            // Apply damage
+            ref HealthComponent health = ref entity.Get<HealthComponent>();
+            Health.ModifyHealth(ref health, health.Value - amount);
+
+            // Update health bar
+            Game.World.HealthBar.UpdateDisplay();
+
+            if (health.Value <= 0)
+            {
+
+            }
+            else
+            {
+                // Activate hurt timer
+                player.HurtTimer = HurtTime;
+
+                // Use hurt color
+                ref SpriteComponent sprite = ref entity.Get<SpriteComponent>();
+                sprite.Color = HurtColor;
+            }
+        }
+
+        // Heals a player by an amount
+        public void HealPlayer(Entity entity, int amount)
+        {
+            // Apply healing
+            ref HealthComponent playerHealth = ref entity.Get<HealthComponent>();
+            Health.ModifyHealth(ref playerHealth, playerHealth.Value + amount);
+
+            // Update health bar
+            Game.World.HealthBar.UpdateDisplay();
+        }
+
+        // Returns a facing direction based on movement
+        public static Vector2 GetFacingDirection(Vector2 direction)
         {
             if (direction.Y == 0.0f)
             {
@@ -90,6 +143,7 @@ namespace RobotGame.Systems
             return new Vector2(0.0f, direction.Y);
         }
 
+        // Returns a texture based on a direction
         public Texture2D GetFacingTexture(Vector2 direction)
         {
             Renderer renderer = Game.Renderer;
@@ -114,6 +168,7 @@ namespace RobotGame.Systems
             return renderer.PlayerDownTexture;
         }
 
+        // Applies acceleration on an axis
         public float ApplyMovement(float velocity, float moveDirection, float delta)
         {
             if (moveDirection == 0.0f)
@@ -136,9 +191,9 @@ namespace RobotGame.Systems
             }
         }
 
+        // Moves across both axes
         public void Move(ref PlayerData playerData, Vector2 moveDirection, float delta)
         {
-            // Move across both axes
             playerData.Body.Velocity.X =
                 ApplyMovement(playerData.Body.Velocity.X, moveDirection.X, delta);
 
@@ -146,6 +201,7 @@ namespace RobotGame.Systems
                 ApplyMovement(playerData.Body.Velocity.Y, moveDirection.Y, delta);
         }
 
+        // Fires projectiles
         public void Shoot(
             ref PlayerData playerData,
             World entities,
@@ -178,6 +234,7 @@ namespace RobotGame.Systems
             }
         }
 
+        // Controls animations
         public void Animate(ref PlayerData playerData, Vector2 moveDirection)
         {
             if (moveDirection == Vector2.Zero)
@@ -249,6 +306,18 @@ namespace RobotGame.Systems
                 Move(ref playerData, moveDirection, delta);
                 Shoot(ref playerData, entities, shootDirection, delta);
                 Animate(ref playerData, moveDirection);
+
+                // Update hurt timer
+                if (player.HurtTimer > 0.0f)
+                {
+                    player.HurtTimer -= delta;
+
+                    // Reset sprite color if finished
+                    if (player.HurtTimer <= 0.0f)
+                    {
+                        sprite.Color = Color.White;
+                    }
+                }
             });
         }
     }

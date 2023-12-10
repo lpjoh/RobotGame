@@ -9,7 +9,6 @@ namespace RobotGame.Systems
     public class GearSystem : ISystem
     {
         public Vector2 AreaSize = new(16.0f, 16.0f);
-
         public GameRect[] AreaRects;
 
         public SpriteAnimation TurnAnimation;
@@ -28,19 +27,20 @@ namespace RobotGame.Systems
                 CollectibleComponent,
                 SpriteComponent,
                 SpriteAnimatorComponent>();
+
+            // Create area rect
+            AreaRects = new GameRect[]
+            {
+                new GameRect(Vector2.Zero, AreaSize)
+            };
         }
 
         // Spawns a new gear
         public Entity CreateGear(World entities, Vector2 position)
         {
-            AreaRects = new GameRect[]
-            {
-                new GameRect(Vector2.Zero, AreaSize)
-            };
-
             Entity entity = entities.Create(
                 new GearComponent(),
-                new PositionComponent { Position = position },
+                new PositionComponent { Position = position - AreaSize * 0.5f },
                 new PhysicsAreaComponent { Rects = AreaRects },
                 new CollectibleComponent(),
                 new SpriteComponent { Texture = Game.Renderer.GearTexture },
@@ -74,6 +74,9 @@ namespace RobotGame.Systems
             {
                 if (collectible.Collected)
                 {
+                    // Add to player's gear count
+                    Game.World.Player.Get<PlayerComponent>().GearCount++;
+
                     Game.World.CollectibleSystem.CollectEntity(entity);
                 }
             });

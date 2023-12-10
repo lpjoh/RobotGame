@@ -8,6 +8,12 @@ namespace RobotGame.Components
         public Texture2D Texture;
         public Rectangle Frame;
         public Vector2 Offset;
+        public Color Color;
         public bool FlipX;
+
+        public SpriteComponent()
+        {
+            Color = Color.White;
+        }
     }
 }

@@ -20,6 +20,7 @@ namespace RobotGame
         public PlayerSystem PlayerSystem;
         public BulletSystem BulletSystem;
 
+        public EnemySystem EnemySystem;
         public AlienEnemySystem AlienEnemySystem;
 
         public CollectibleSystem CollectibleSystem;
@@ -27,6 +28,7 @@ namespace RobotGame
         public BatterySystem BatterySystem;
 
         public HealthBar HealthBar;
+        public GearDisplay GearDisplay;
 
         public Random Random = new();
 
@@ -52,6 +54,9 @@ namespace RobotGame
             BulletSystem = new BulletSystem(Game);
             Systems.Add(BulletSystem);
 
+            EnemySystem = new EnemySystem(Game);
+            Systems.Add(EnemySystem);
+
             AlienEnemySystem = new AlienEnemySystem(Game);
             Systems.Add(AlienEnemySystem);
 
@@ -65,8 +70,9 @@ namespace RobotGame
             BatterySystem = new BatterySystem(Game);
             Systems.Add(BatterySystem);
 
-            // Create health bar
+            // Create stat displays
             HealthBar = new HealthBar(Game);
+            GearDisplay = new GearDisplay(Game);
         }
 
         // Queues an entity to be destroyed
@@ -85,12 +91,14 @@ namespace RobotGame
                 system.Initialize();
             }
 
-            Player = PlayerSystem.CreatePlayer(Entities, Vector2.Zero);
+            Player = PlayerSystem.CreatePlayer(Entities, new Vector2(120.0f, 90.0f));
 
             GearSystem.CreateGear(Entities, Vector2.One * 32.0f);
             BatterySystem.CreateBattery(Entities, Vector2.One * 64.0f);
 
             AlienEnemySystem.CreateAlienEnemy(Entities, Vector2.One * 96.0f);
+
+            HealthBar.UpdateDisplay();
         }
 
         public void Update(float delta)

@@ -6,5 +6,7 @@ namespace RobotGame.Components
     {
         public Vector2 FacingDirection;
         public float ShootTimer;
+        public float HurtTimer;
+        public int GearCount;
     }
 }

@@ -1,5 +1,4 @@
-﻿using Arch.Core;
-using Arch.Core.Extensions;
+﻿using Arch.Core.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RobotGame.Components;
@@ -12,6 +11,8 @@ namespace RobotGame
         public Vector2 Position = new(2.0f, 2.0f);
         public Vector2 FrontOffset = new(2.0f, 7.0f);
 
+        public Rectangle FrontDstRect, FrontSrcRect;
+
         public RobotGame Game;
 
         public HealthBar(RobotGame game)
@@ -19,13 +20,10 @@ namespace RobotGame
             Game = game;
         }
 
-        public void Draw(Renderer renderer)
+        // Updates the display based on health
+        public void UpdateDisplay()
         {
-            Texture2D backTexture = renderer.HealthBackTexture;
-            Texture2D frontTexture = renderer.HealthFrontTexture;
-
-            // Draw back
-            renderer.SpriteBatch.Draw(backTexture, Position, Color.White);
+            Texture2D frontTexture = Game.Renderer.HealthFrontTexture;
 
             // Get ratio between player's health and max health
             HealthComponent health = Game.World.Player.Get<HealthComponent>();
@@ -39,15 +37,22 @@ namespace RobotGame
             Vector2 frontDstPos = Position + FrontOffset + frontSrcPos;
 
             // Create front rects
-            Rectangle frontDstRect = new(
+            FrontDstRect = new(
                 (int)frontDstPos.X, (int)frontDstPos.Y,
                 (int)frontSize.X, (int)frontSize.Y);
 
-            Rectangle frontSrcRect = new(
+            FrontSrcRect = new(
                 (int)frontSrcPos.X, (int)frontSrcPos.Y,
                 (int)frontSize.X, (int)frontSize.Y);
+        }
 
-            renderer.SpriteBatch.Draw(frontTexture, frontDstRect, frontSrcRect, Color.White);
+        public void Draw(Renderer renderer)
+        {
+            Texture2D backTexture = renderer.HealthBackTexture;
+            Texture2D frontTexture = renderer.HealthFrontTexture;
+
+            renderer.SpriteBatch.Draw(backTexture, Position, Color.White);
+            renderer.SpriteBatch.Draw(frontTexture, FrontDstRect, FrontSrcRect, Color.White);
         }
     }
 }

@@ -97,6 +97,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/font_wide.png
 
+#begin Textures/gear_icon.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/gear_icon.png
+
 #begin Textures/gear.png
 /importer:TextureImporter
 /processor:TextureProcessor

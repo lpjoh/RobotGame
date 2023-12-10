@@ -9,7 +9,6 @@ namespace RobotGame.Systems
     public class BatterySystem : ISystem
     {
         public Vector2 AreaSize = new(16.0f, 16.0f);
-
         public GameRect[] AreaRects;
 
         public SpriteAnimation FlashAnimation;
@@ -28,19 +27,20 @@ namespace RobotGame.Systems
                 CollectibleComponent,
                 SpriteComponent,
                 SpriteAnimatorComponent>();
+
+            // Create area rect
+            AreaRects = new GameRect[]
+            {
+                new GameRect(Vector2.Zero, AreaSize)
+            };
         }
 
         // Spawns a new battery
         public Entity CreateBattery(World entities, Vector2 position)
         {
-            AreaRects = new GameRect[]
-            {
-                new GameRect(Vector2.Zero, AreaSize)
-            };
-
             Entity entity = entities.Create(
                 new BatteryComponent(),
-                new PositionComponent { Position = position },
+                new PositionComponent { Position = position - AreaSize * 0.5f },
                 new PhysicsAreaComponent { Rects = AreaRects },
                 new CollectibleComponent(),
                 new SpriteComponent { Texture = Game.Renderer.BatteryTexture },
@@ -74,8 +74,7 @@ namespace RobotGame.Systems
             {
                 if (collectible.Collected)
                 {
-                    ref HealthComponent playerHealth = ref Game.World.Player.Get<HealthComponent>();
-                    Health.ModifyHealth(ref playerHealth, playerHealth.Value + 1);
+                    Game.World.PlayerSystem.HealPlayer(Game.World.Player, 1);
 
                     Game.World.CollectibleSystem.CollectEntity(entity);
                 }

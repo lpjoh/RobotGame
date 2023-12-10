@@ -35,13 +35,20 @@ namespace RobotGame.Systems
                 ref CollectibleComponent collectible,
                 ref PhysicsAreaComponent area) =>
             {
-                // Check if collected by player
+                // Check if collected by player's collect rect
                 foreach (PhysicsAreaCollision collision in area.Collisions)
                 {
-                    if (collision.Entity.Has<PlayerComponent>())
+                    if (!collision.Entity.Has<PlayerComponent>())
                     {
-                        collectible.Collected = true;
+                        continue;
                     }
+
+                    if (collision.RectIndex != PlayerSystem.CollectRectIndex)
+                    {
+                        continue;
+                    }
+
+                    collectible.Collected = true;
                 }
             });
         }

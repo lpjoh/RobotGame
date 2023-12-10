@@ -31,22 +31,26 @@ namespace RobotGame.Systems
         {
             // Put every matching entity into list
             List<Entity> areaEntities = new();
-            entities.Query(in Query, areaEntities.Add);
+            entities.GetEntities(Query, areaEntities);
+
+            // Clear all previous collisions
+            foreach (Entity entity in areaEntities)
+            {
+                entity.Get<PhysicsAreaComponent>().Collisions.Clear();
+            }
 
             // Test every entity against every other
-            for (int ei1 = 0; ei1 < areaEntities.Count; ei1++)
+            for (int ei1 = 1; ei1 < areaEntities.Count; ei1++)
             {
                 Entity entity1 = areaEntities[ei1];
 
                 ref PhysicsAreaComponent area1 = ref entity1.Get<PhysicsAreaComponent>();
                 ref PositionComponent position1 = ref entity1.Get<PositionComponent>();
 
-                area1.Collisions.Clear();
-
                 for (int ei2 = 0; ei2 < areaEntities.Count; ei2++)
                 {
-                    // End loop when indices match
-                    if (ei1 == ei2)
+                    // End loop when second index reaches first, avoiding duplicate checks
+                    if (ei2 >= ei1)
                     {
                         break;
                     }
@@ -55,8 +59,6 @@ namespace RobotGame.Systems
 
                     ref PhysicsAreaComponent area2 = ref entity2.Get<PhysicsAreaComponent>();
                     ref PositionComponent position2 = ref entity2.Get<PositionComponent>();
-
-                    area2.Collisions.Clear();
 
                     // Test every rect against every other
                     for (int ri1 = 0; ri1 < area1.Rects.Length; ri1++)

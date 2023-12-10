@@ -16,6 +16,9 @@ namespace RobotGame.Systems
         public Vector2 BodySize = new(8.0f, 8.0f);
         public Vector2 SpriteOffset = new(-4.0f, -7.0f);
 
+        public Vector2 AreaSize = new(12.0f, 12.0f);
+        public GameRect[] AreaRects;
+
         public SpriteAnimation WalkAnimation;
 
         public RobotGame Game;
@@ -27,10 +30,18 @@ namespace RobotGame.Systems
 
             Query = new QueryDescription().WithAll<
                 AlienEnemyComponent,
+                EnemyComponent,
                 PositionComponent,
                 PhysicsBodyComponent,
+                PhysicsAreaComponent,
                 SpriteComponent,
                 SpriteAnimatorComponent>();
+
+            // Create area rect
+            AreaRects = new GameRect[]
+            {
+                new GameRect((BodySize - AreaSize) * 0.5f, AreaSize)
+            };
         }
 
         // Spawns a new enemy
@@ -38,8 +49,10 @@ namespace RobotGame.Systems
         {
             Entity entity = entities.Create(
                 new AlienEnemyComponent(),
+                new EnemyComponent(),
                 new PositionComponent { Position = position },
                 new PhysicsBodyComponent { Size = BodySize },
+                new PhysicsAreaComponent { Rects = AreaRects },
                 new SpriteComponent { Texture = Game.Renderer.AlienEnemyTexture, Offset = SpriteOffset },
                 new SpriteAnimatorComponent());
 
@@ -69,8 +82,10 @@ namespace RobotGame.Systems
             entities.Query(in Query, (
                 Entity entity,
                 ref AlienEnemyComponent alienEnemy,
+                ref EnemyComponent enemy,
                 ref PositionComponent position,
                 ref PhysicsBodyComponent body,
+                ref PhysicsAreaComponent area,
                 ref SpriteComponent sprite,
                 ref SpriteAnimatorComponent spriteAnimator) =>
             {

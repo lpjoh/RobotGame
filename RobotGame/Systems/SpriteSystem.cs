@@ -28,7 +28,7 @@ namespace RobotGame.Systems
                     sprite.Texture,
                     position.Position + sprite.Offset,
                     sprite.Frame,
-                    Color.White,
+                    sprite.Color,
                     0.0f,
                     Vector2.Zero,
                     Vector2.One,
