@@ -37,18 +37,6 @@
 /processorParam:TextureFormat=Color
 /build:Textures/battery.png
 
-#begin Textures/battery.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/battery.png
-
 #begin Textures/bomb.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -97,7 +85,7 @@
 /processorParam:TextureFormat=Color
 /build:Textures/explosion.png
 
-#begin Textures/gear.png
+#begin Textures/font_wide.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -107,7 +95,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Textures/gear.png
+/build:Textures/font_wide.png
 
 #begin Textures/gear.png
 /importer:TextureImporter

@@ -47,7 +47,6 @@ namespace RobotGame
                 Exit();
 
             World.Update(delta);
-            Renderer.Update(delta);
 
             base.Update(gameTime);
         }

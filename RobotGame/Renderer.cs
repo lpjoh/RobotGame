@@ -31,12 +31,16 @@ namespace RobotGame
             GearTexture,
 
             HealthBackTexture,
-            HealthFrontTexture;
+            HealthFrontTexture,
+            
+            FontTexture;
 
         public SpriteSystem SpriteSystem = new();
         public SpriteAnimatorSystem SpriteAnimatorSystem = new();
         public PhysicsBodyRendererSystem PhysicsBodyRendererSystem;
         public PhysicsAreaRendererSystem PhysicsAreaRendererSystem;
+
+        public TextRenderer TextRenderer;
 
         public RobotGame Game;
 
@@ -67,6 +71,8 @@ namespace RobotGame
             Game.World.HealthBar.Draw(this);
 
             DrawDebug();
+
+            TextRenderer.DrawText(this, "the quick brown fox jumps over the lazy dog", Vector2.Zero);
 
             SpriteBatch.End();
         }
@@ -127,11 +133,11 @@ namespace RobotGame
 
             HealthBackTexture = content.Load<Texture2D>("Textures/health_back");
             HealthFrontTexture = content.Load<Texture2D>("Textures/health_front");
-        }
 
-        public void Update(float delta)
-        {
-            World entities = Game.World.Entities;
+            FontTexture = content.Load<Texture2D>("Textures/font_wide");
+
+            // Create text renderer
+            TextRenderer = new TextRenderer(FontTexture, new Point(12, 12), "Content/font_spacings.json");
         }
 
         public void Draw()

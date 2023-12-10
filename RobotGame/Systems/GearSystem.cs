@@ -75,7 +75,7 @@ namespace RobotGame.Systems
                 {
                     if (collision.Entity.Has<PlayerComponent>())
                     {
-                        entities.Destroy(entity);
+                        Game.World.QueueDestroyEntity(entity);
                     }
                 }
             });

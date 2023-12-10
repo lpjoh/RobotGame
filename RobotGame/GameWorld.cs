@@ -22,6 +22,8 @@ namespace RobotGame
 
         public HealthBar HealthBar;
 
+        public Queue<Entity> EntityDestructionQueue = new();
+
         public List<ISystem> Systems = new();
 
         public GameWorld(RobotGame game)
@@ -47,6 +49,12 @@ namespace RobotGame
             HealthBar = new HealthBar(Game);
         }
 
+        // Queues an entity to be destroyed
+        public void QueueDestroyEntity(Entity entity)
+        {
+            EntityDestructionQueue.Enqueue(entity);
+        }
+
         public void Initialize()
         {
             Entities = World.Create();
@@ -68,6 +76,12 @@ namespace RobotGame
             foreach (ISystem system in Systems)
             {
                 system.Update(Entities, delta);
+            }
+
+            // Delete queued entities
+            for (int i = 0; i < EntityDestructionQueue.Count; i++)
+            {
+                Entities.Destroy(EntityDestructionQueue.Dequeue());
             }
         }
     }
