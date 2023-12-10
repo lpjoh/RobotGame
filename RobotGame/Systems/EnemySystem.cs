@@ -1,9 +1,7 @@
 ﻿using Arch.Core;
 using Arch.Core.Extensions;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using RobotGame.Components;
-using System;
 
 namespace RobotGame.Systems
 {

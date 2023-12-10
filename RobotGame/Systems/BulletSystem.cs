@@ -95,6 +95,12 @@ namespace RobotGame.Systems
                 ref SpriteComponent sprite,
                 ref SpriteAnimatorComponent spriteAnimator) =>
             {
+                // Destroy if hit something
+                if (body.Collisions.Count > 0)
+                {
+                    DestroyBullet(entity);
+                }
+
                 switch (bullet.Type)
                 {
                     case BulletType.Player:

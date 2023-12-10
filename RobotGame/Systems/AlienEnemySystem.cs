@@ -51,9 +51,9 @@ namespace RobotGame.Systems
             Entity entity = entities.Create(
                 new AlienEnemyComponent(),
                 new EnemyComponent(),
-                new PositionComponent { Position = position },
+                new PositionComponent { Position = position - BodySize * 0.5f },
                 new VelocityComponent(),
-                new PhysicsBodyComponent { Size = BodySize, MoverMask = 1, ColliderMask = 0 },
+                new PhysicsBodyComponent { Size = BodySize, Bounce = -Vector2.One, MoverMask = 1, ColliderMask = 0 },
                 new PhysicsAreaComponent { Rects = AreaRects },
                 new SpriteComponent { Texture = Game.Renderer.AlienEnemyTexture, Offset = SpriteOffset },
                 new SpriteAnimatorComponent());

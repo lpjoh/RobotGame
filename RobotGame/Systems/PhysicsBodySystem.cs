@@ -1,6 +1,8 @@
 ﻿using Arch.Core;
 using Arch.Core.Extensions;
+using Microsoft.Xna.Framework;
 using RobotGame.Components;
+using System;
 using System.Collections.Generic;
 
 namespace RobotGame.Systems
@@ -29,22 +31,28 @@ namespace RobotGame.Systems
             return (moverBody.MoverMask & collderBody.ColliderMask) != 0;
         }
 
-        // Moves an entity along the X axis
-        public float MoveAndCollideX(
+        // Gets a collision along the X axis
+        public static PhysicsBodyCollision? GetCollisionX(
             ref PhysicsBodyComponent moverBody,
             ref PositionComponent moverPosition,
             ref VelocityComponent moverVelocity,
-            
-            ref PhysicsBodyComponent colliderBody,
-            ref PositionComponent colliderPosition,
-
+            Entity collider,
             float endPosition)
         {
+            ref PhysicsBodyComponent colliderBody = ref collider.Get<PhysicsBodyComponent>();
+
+            if (!BodyLayersMatch(ref moverBody, ref colliderBody))
+            {
+                return null;
+            }
+
+            ref PositionComponent colliderPosition = ref collider.Get<PositionComponent>();
+
             // Check vertical alignment
             if (moverPosition.Position.Y + moverBody.Size.Y <= colliderPosition.Position.Y ||
                 moverPosition.Position.Y >= colliderPosition.Position.Y + colliderBody.Size.Y)
             {
-                return endPosition;
+                return null;
             }
 
             if (moverVelocity.Velocity.X < 0.0f)
@@ -52,14 +60,18 @@ namespace RobotGame.Systems
                 // Left
                 if (moverPosition.Position.X + moverBody.Size.X <= colliderPosition.Position.X)
                 {
-                    return endPosition;
+                    return null;
                 }
 
                 float wall = colliderPosition.Position.X + colliderBody.Size.X;
 
                 if (endPosition < wall)
                 {
-                    return wall;
+                    return new PhysicsBodyCollision
+                    {
+                        Position = new Vector2(wall, moverPosition.Position.Y),
+                        Normal = new Vector2(1.0f, 0.0f)
+                    };
                 }
             }
             else
@@ -67,37 +79,47 @@ namespace RobotGame.Systems
                 // Right
                 if (moverPosition.Position.X >= colliderPosition.Position.X + colliderBody.Size.X)
                 {
-                    return endPosition;
+                    return null;
                 }
 
                 float wall = colliderPosition.Position.X - moverBody.Size.X;
 
                 if (endPosition > wall)
                 {
-                    return wall;
+                    return new PhysicsBodyCollision
+                    {
+                        Position = new Vector2(wall, moverPosition.Position.Y),
+                        Normal = new Vector2(-1.0f, 0.0f)
+                    };
                 }
             }
 
             // No collision
-            return endPosition;
+            return null;
         }
 
-        // Moves an entity along the Y axis
-        public float MoveAndCollideY(
+        // Gets a collision along the Y axis
+        public static PhysicsBodyCollision? GetCollisionY(
             ref PhysicsBodyComponent moverBody,
             ref PositionComponent moverPosition,
             ref VelocityComponent moverVelocity,
-
-            ref PhysicsBodyComponent colliderBody,
-            ref PositionComponent colliderPosition,
-
+            Entity collider,
             float endPosition)
         {
+            ref PhysicsBodyComponent colliderBody = ref collider.Get<PhysicsBodyComponent>();
+
+            if (!BodyLayersMatch(ref moverBody, ref colliderBody))
+            {
+                return null;
+            }
+
+            ref PositionComponent colliderPosition = ref collider.Get<PositionComponent>();
+
             // Check horizontal alignment
             if (moverPosition.Position.X + moverBody.Size.X <= colliderPosition.Position.X ||
                 moverPosition.Position.X >= colliderPosition.Position.X + colliderBody.Size.X)
             {
-                return endPosition;
+                return null;
             }
 
             if (moverVelocity.Velocity.Y < 0.0f)
@@ -105,14 +127,18 @@ namespace RobotGame.Systems
                 // Up
                 if (moverPosition.Position.Y + moverBody.Size.Y <= colliderPosition.Position.Y)
                 {
-                    return endPosition;
+                    return null;
                 }
 
                 float wall = colliderPosition.Position.Y + colliderBody.Size.Y;
 
                 if (endPosition < wall)
                 {
-                    return wall;
+                    return new PhysicsBodyCollision
+                    {
+                        Position = new Vector2(moverPosition.Position.X, wall),
+                        Normal = new Vector2(0.0f, 1.0f)
+                    };
                 }
             }
             else
@@ -120,19 +146,23 @@ namespace RobotGame.Systems
                 // Down
                 if (moverPosition.Position.Y >= colliderPosition.Position.Y + colliderBody.Size.Y)
                 {
-                    return endPosition;
+                    return null;
                 }
 
                 float wall = colliderPosition.Position.Y - moverBody.Size.Y;
 
                 if (endPosition > wall)
                 {
-                    return wall;
+                    return new PhysicsBodyCollision
+                    {
+                        Position = new Vector2(moverPosition.Position.X, wall),
+                        Normal = new Vector2(0.0f, -1.0f)
+                    };
                 }
             }
 
             // No collision
-            return endPosition;
+            return null;
         }
 
         public void Initialize()
@@ -154,10 +184,14 @@ namespace RobotGame.Systems
                 ref PositionComponent moverPosition = ref mover.Get<PositionComponent>();
                 ref VelocityComponent moverVelocity = ref mover.Get<VelocityComponent>();
 
+                // Clear collisions
+                moverBody.Collisions.Clear();
+
                 // Collide X
                 if (moverVelocity.Velocity.X != 0.0f)
                 {
                     float endPosition = moverPosition.Position.X + moverVelocity.Velocity.X * delta;
+                    PhysicsBodyCollision? collision = null;
 
                     foreach (Entity collider in colliders)
                     {
@@ -167,28 +201,34 @@ namespace RobotGame.Systems
                             continue;
                         }
 
-                        ref PhysicsBodyComponent colliderBody = ref collider.Get<PhysicsBodyComponent>();
-
-                        if (!BodyLayersMatch(ref moverBody, ref colliderBody))
-                        {
-                            continue;
-                        }
-
-                        ref PositionComponent colliderPosition = ref collider.Get<PositionComponent>();
-
-                        endPosition = MoveAndCollideX(
+                        // Check new collision
+                        PhysicsBodyCollision? newCollision = GetCollisionX(
                             ref moverBody, ref moverPosition, ref moverVelocity,
-                            ref colliderBody, ref colliderPosition,
-                            endPosition);
+                            collider, endPosition);
+
+                        if (newCollision != null)
+                        {
+                            collision = newCollision;
+                            endPosition = collision.Value.Position.X;
+                        }
                     }
 
+                    // Apply movement
                     moverPosition.Position.X = endPosition;
+                    
+                    if (collision != null)
+                    {
+                        moverBody.Collisions.Add(collision.Value);
+
+                        moverVelocity.Velocity.X *= moverBody.Bounce.X;
+                    }
                 }
 
                 // Collide Y
                 if (moverVelocity.Velocity.Y != 0.0f)
                 {
                     float endPosition = moverPosition.Position.Y + moverVelocity.Velocity.Y * delta;
+                    PhysicsBodyCollision? collision = null;
 
                     foreach (Entity collider in colliders)
                     {
@@ -198,22 +238,27 @@ namespace RobotGame.Systems
                             continue;
                         }
 
-                        ref PhysicsBodyComponent colliderBody = ref collider.Get<PhysicsBodyComponent>();
-
-                        if (!BodyLayersMatch(ref moverBody, ref colliderBody))
-                        {
-                            continue;
-                        }
-
-                        ref PositionComponent colliderPosition = ref collider.Get<PositionComponent>();
-
-                        endPosition = MoveAndCollideY(
+                        // Check new collision
+                        PhysicsBodyCollision? newCollision = GetCollisionY(
                             ref moverBody, ref moverPosition, ref moverVelocity,
-                            ref colliderBody, ref colliderPosition,
-                            endPosition);
+                            collider, endPosition);
+
+                        if (newCollision != null)
+                        {
+                            collision = newCollision;
+                            endPosition = collision.Value.Position.Y;
+                        }
                     }
 
+                    // Apply movement
                     moverPosition.Position.Y = endPosition;
+
+                    if (collision != null)
+                    {
+                        moverBody.Collisions.Add(collision.Value);
+
+                        moverVelocity.Velocity.Y *= moverBody.Bounce.Y;
+                    }
                 }
             }
         }

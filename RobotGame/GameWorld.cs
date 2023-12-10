@@ -30,6 +30,8 @@ namespace RobotGame
         public GearSystem GearSystem;
         public BatterySystem BatterySystem;
 
+        public EnemyFactory EnemyFactory;
+
         public HealthBar HealthBar;
         public GearDisplay GearDisplay;
 
@@ -131,16 +133,15 @@ namespace RobotGame
 
             Player = PlayerSystem.CreatePlayer(Entities, new Vector2(120.0f, 90.0f));
 
-            GearSystem.CreateGear(Entities, Vector2.One * 32.0f);
-            BatterySystem.CreateBattery(Entities, Vector2.One * 64.0f);
-
-            AlienEnemySystem.CreateAlienEnemy(Entities, Vector2.One * 96.0f);
+            EnemyFactory = new EnemyFactory(Game);
 
             HealthBar.UpdateDisplay();
         }
 
         public void Update(float delta)
         {
+            EnemyFactory.Update(delta);
+
             // Update each system by interface
             foreach (ISystem system in Systems)
             {
