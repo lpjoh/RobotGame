@@ -45,6 +45,7 @@ namespace RobotGame.Systems
             // Play new animation with resetted time
             animator.Animation = animation;
             animator.Time = 0.0f;
+            animator.Finished = false;
         }
 
         public void Initialize()
@@ -67,15 +68,35 @@ namespace RobotGame.Systems
                     return;
                 }
 
+                // Stop if finished
+                if (!animation.Loops && animator.Finished)
+                {
+                    return;
+                }
+
                 // Get frame index by flooring time
                 int frameIndex = (int)animator.Time;
 
                 // Load frame rect
                 sprite.Frame = animation.Frames[frameIndex];
 
-                // Advance animation by FPS with looping
+                // Advance animation by FPS
                 animator.Time += delta * animation.FramesPerSecond;
-                animator.Time %= animation.Frames.Count;
+
+                // Loop or finish
+                float duration = animation.Frames.Count;
+
+                if (animator.Time >= duration)
+                {
+                    if (animation.Loops)
+                    {
+                        animator.Time %= duration;
+                    }
+                    else
+                    {
+                        animator.Finished = true;
+                    }
+                }
             });
         }
     }

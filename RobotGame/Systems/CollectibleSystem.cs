@@ -35,7 +35,17 @@ namespace RobotGame.Systems
                 ref CollectibleComponent collectible,
                 ref PhysicsAreaComponent area) =>
             {
-                // Check if collected by player's collect rect
+                // Update despawn timer
+                if (collectible.DespawnTimer <= 0.0f)
+                {
+                    Game.World.QueueDestroyEntity(entity);
+                }
+                else
+                {
+                    collectible.DespawnTimer -= delta;
+                }
+
+                // Check if collected by player
                 foreach (PhysicsAreaCollision collision in area.Collisions)
                 {
                     if (!collision.Entity.Has<PlayerComponent>())

@@ -11,7 +11,8 @@ namespace RobotGame.Systems
     {
         public const float Speed = 20.0f;
         public const float MoveTime = 1.0f;
-        public const float ShootTime = 0.4f;
+        public const float ShootTime = 1.0f;
+        public const float BulletSpeed = 50.0f;
 
         public Vector2 BodySize = new(8.0f, 8.0f);
         public Vector2 SpriteOffset = new(-4.0f, -7.0f);
@@ -128,7 +129,7 @@ namespace RobotGame.Systems
                     }
 
                     Game.World.BulletSystem.CreateBullet(
-                        entities, position.Position + body.Size * 0.5f, bulletDirection, BulletType.Enemy);
+                        entities, position.Position + body.Size * 0.5f, bulletDirection, BulletSpeed, BulletType.Enemy);
                 }
                 else
                 {

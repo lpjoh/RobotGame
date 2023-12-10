@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using System;
 using RobotGame.Components;
+using Arch.Core.Extensions;
 
 namespace RobotGame
 {
@@ -151,6 +152,12 @@ namespace RobotGame
             // Delete queued entities
             foreach (Entity entity in EntityDestructionQueue)
             {
+                // Skip dead entities
+                if (!entity.IsAlive())
+                {
+                    continue;
+                }
+
                 Entities.Destroy(entity);
             }
 

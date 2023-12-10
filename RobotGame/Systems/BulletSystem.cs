@@ -4,13 +4,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RobotGame.Components;
 using System;
+using System.Collections.Generic;
 
 namespace RobotGame.Systems
 {
     public class BulletSystem : ISystem
     {
-        public const float Speed = 100.0f;
-
         public Vector2 BodySize = new(4.0f, 4.0f);
 
         public Vector2 AreaSize = new(6.0f, 6.0f);
@@ -18,7 +17,7 @@ namespace RobotGame.Systems
 
         public Vector2 SpriteOffset = new(-2.0f, -2.0f);
 
-        public SpriteAnimation FlashAnimation;
+        public SpriteAnimation FlashAnimation, EndAnimation;
 
         public RobotGame Game;
         public QueryDescription Query;
@@ -44,7 +43,7 @@ namespace RobotGame.Systems
         }
 
         // Spawns a new bullet
-        public Entity CreateBullet(World entities, Vector2 position, Vector2 direction, BulletType type)
+        public Entity CreateBullet(World entities, Vector2 position, Vector2 direction, float speed, BulletType type)
         {
             Texture2D texture = type switch
             {
@@ -56,7 +55,7 @@ namespace RobotGame.Systems
             Entity entity = entities.Create(
                 new BulletComponent { Type = type },
                 new PositionComponent { Position = position - BodySize * 0.5f },
-                new VelocityComponent { Velocity = direction * Speed },
+                new VelocityComponent { Velocity = direction * speed },
                 new PhysicsBodyComponent { Size = BodySize, MoverMask = 1, ColliderMask = 0 },
                 new PhysicsAreaComponent { Rects = AreaRects },
                 new SpriteComponent { Texture = texture, Offset = SpriteOffset },
@@ -71,16 +70,34 @@ namespace RobotGame.Systems
         // Destroys a bullet
         public void DestroyBullet(Entity entity)
         {
-            Game.World.QueueDestroyEntity(entity);
+            ref BulletComponent bullet = ref entity.Get<BulletComponent>();
+
+            // Skip if already ended
+            if (bullet.Ended)
+            {
+                return;
+            }
+
+            bullet.Ended = true;
+
+            SpriteAnimatorSystem.PlayAnimation(ref entity.Get<SpriteAnimatorComponent>(), EndAnimation);
+
+            // Stop moving
+            entity.Get<VelocityComponent>().Velocity = Vector2.Zero;
         }
 
         public void Initialize()
         {
-            // Create animation
+            // Create animations
             Texture2D texture = Game.Renderer.PlayerBulletTexture;
 
-            FlashAnimation = new SpriteAnimation(
-                SpriteAnimatorSystem.GetFrames(texture, 2), 10.0f);
+            List<Rectangle>
+                spriteFrames = SpriteAnimatorSystem.GetFrames(texture, 5),
+                flashFrames = new() { spriteFrames[0], spriteFrames[1] },
+                endFrames = new() { spriteFrames[2], spriteFrames[3], spriteFrames[4] };
+
+            FlashAnimation = new SpriteAnimation(flashFrames, 10.0f);
+            EndAnimation = new SpriteAnimation(endFrames, 20.0f, loops: false);
         }
 
         public void Update(World entities, float delta)
@@ -95,6 +112,17 @@ namespace RobotGame.Systems
                 ref SpriteComponent sprite,
                 ref SpriteAnimatorComponent spriteAnimator) =>
             {
+                // Destroy bullet if animation finished
+                if (bullet.Ended)
+                {
+                    if (spriteAnimator.Finished)
+                    {
+                        Game.World.QueueDestroyEntity(entity);
+                    }
+
+                    return;
+                }
+
                 // Destroy if hit something
                 if (body.Collisions.Count > 0)
                 {

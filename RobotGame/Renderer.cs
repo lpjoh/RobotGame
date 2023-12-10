@@ -77,7 +77,7 @@ namespace RobotGame
             Game.World.HealthBar.Draw(this);
             Game.World.GearDisplay.Draw(this);
 
-            DrawDebug();
+            //DrawDebug();
 
             SpriteBatch.End();
         }

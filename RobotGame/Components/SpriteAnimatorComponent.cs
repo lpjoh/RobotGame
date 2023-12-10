@@ -4,5 +4,6 @@
     {
         public SpriteAnimation Animation;
         public float Time;
+        public bool Finished;
     }
 }

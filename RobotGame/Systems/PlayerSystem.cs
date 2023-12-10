@@ -26,9 +26,12 @@ namespace RobotGame.Systems
     {
         public const float Acceleration = 400.0f;
         public const float MaxSpeed = 60.0f;
-        public const float ShootTime = 0.2f;
-        public const float HurtTime = 1.0f;
         public const int MaxHealth = 4;
+
+        public const float ShootTime = 0.2f;
+        public const float BulletSpeed = 100.0f;
+
+        public const float HurtTime = 1.0f;
 
         public const int CollectRectIndex = 0, HurtRectIndex = 1;
 
@@ -172,7 +175,7 @@ namespace RobotGame.Systems
         }
 
         // Applies acceleration on an axis
-        public float ApplyMovement(float velocity, float moveDirection, float delta)
+        public static float ApplyMovement(float velocity, float moveDirection, float delta)
         {
             if (moveDirection == 0.0f)
             {
@@ -224,7 +227,7 @@ namespace RobotGame.Systems
                         playerData.Position.Position + playerData.Body.Size * 0.5f;
 
                     bulletSystem.CreateBullet(
-                        entities, bulletPosition, shootDirection, BulletType.Player);
+                        entities, bulletPosition, shootDirection, BulletSpeed, BulletType.Player);
 
                     // Reset shoot timer
                     playerData.Player.ShootTimer = ShootTime;
