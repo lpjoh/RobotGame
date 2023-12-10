@@ -30,6 +30,7 @@ namespace RobotGame.Systems
             Query = new QueryDescription().WithAll<
                 BulletComponent,
                 PositionComponent,
+                VelocityComponent,
                 PhysicsBodyComponent,
                 PhysicsAreaComponent,
                 SpriteComponent,
@@ -55,7 +56,8 @@ namespace RobotGame.Systems
             Entity entity = entities.Create(
                 new BulletComponent { Type = type },
                 new PositionComponent { Position = position - BodySize * 0.5f },
-                new PhysicsBodyComponent { Size = BodySize, Velocity = direction * Speed },
+                new VelocityComponent { Velocity = direction * Speed },
+                new PhysicsBodyComponent { Size = BodySize, MoverMask = 1, ColliderMask = 0 },
                 new PhysicsAreaComponent { Rects = AreaRects },
                 new SpriteComponent { Texture = texture, Offset = SpriteOffset },
                 new SpriteAnimatorComponent());
@@ -87,6 +89,7 @@ namespace RobotGame.Systems
                 Entity entity,
                 ref BulletComponent bullet,
                 ref PositionComponent position,
+                ref VelocityComponent velocity,
                 ref PhysicsBodyComponent body,
                 ref PhysicsAreaComponent area,
                 ref SpriteComponent sprite,
@@ -98,11 +101,13 @@ namespace RobotGame.Systems
                         // Check for enemy collisions
                         foreach (PhysicsAreaCollision collision in area.Collisions)
                         {
-                            if (collision.Entity.Has<EnemyComponent>())
+                            if (!collision.Entity.Has<EnemyComponent>())
                             {
-                                Game.World.EnemySystem.DestroyEnemy(collision.Entity);
-                                DestroyBullet(entity);
+                                continue;
                             }
+
+                            Game.World.EnemySystem.DestroyEnemy(collision.Entity);
+                            DestroyBullet(entity);
                         }
 
                         break;
@@ -111,11 +116,18 @@ namespace RobotGame.Systems
                         // Check for player collisions
                         foreach (PhysicsAreaCollision collision in area.Collisions)
                         {
-                            if (collision.Entity.Has<PlayerComponent>())
+                            if (!collision.Entity.Has<PlayerComponent>())
                             {
-                                Game.World.PlayerSystem.DamagePlayer(collision.Entity, 1);
-                                DestroyBullet(entity);
+                                continue;
                             }
+
+                            if (collision.EntityRectIndex != PlayerSystem.HurtRectIndex)
+                            {
+                                continue;
+                            }
+
+                            Game.World.PlayerSystem.DamagePlayer(collision.Entity, 1);
+                            DestroyBullet(entity);
                         }
 
                         break;

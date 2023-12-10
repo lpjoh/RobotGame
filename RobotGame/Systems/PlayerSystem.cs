@@ -14,6 +14,7 @@ namespace RobotGame.Systems
         public Entity Entity;
         public ref PlayerComponent Player;
         public ref PositionComponent Position;
+        public ref VelocityComponent Velocity;
         public ref PhysicsBodyComponent Body;
         public ref PhysicsAreaComponent Area;
         public ref HealthComponent Health;
@@ -54,6 +55,7 @@ namespace RobotGame.Systems
             Query = new QueryDescription().WithAll<
                 PlayerComponent,
                 PositionComponent,
+                VelocityComponent,
                 PhysicsBodyComponent,
                 PhysicsAreaComponent,
                 HealthComponent,
@@ -74,7 +76,8 @@ namespace RobotGame.Systems
             Entity entity = entities.Create(
                 new PlayerComponent { FacingDirection = new Vector2(0.0f, 1.0f) },
                 new PositionComponent { Position = position - BodySize * 0.5f },
-                new PhysicsBodyComponent { Size = BodySize },
+                new VelocityComponent(),
+                new PhysicsBodyComponent { Size = BodySize, MoverMask = 1, ColliderMask = 0 },
                 new PhysicsAreaComponent { Rects = AreaRects },
                 new HealthComponent() { Value = MaxHealth, MaxValue = MaxHealth },
                 new SpriteComponent { Texture = Game.Renderer.PlayerDownTexture, Offset = SpriteOffset },
@@ -194,11 +197,11 @@ namespace RobotGame.Systems
         // Moves across both axes
         public void Move(ref PlayerData playerData, Vector2 moveDirection, float delta)
         {
-            playerData.Body.Velocity.X =
-                ApplyMovement(playerData.Body.Velocity.X, moveDirection.X, delta);
+            playerData.Velocity.Velocity.X =
+                ApplyMovement(playerData.Velocity.Velocity.X, moveDirection.X, delta);
 
-            playerData.Body.Velocity.Y =
-                ApplyMovement(playerData.Body.Velocity.Y, moveDirection.Y, delta);
+            playerData.Velocity.Velocity.Y =
+                ApplyMovement(playerData.Velocity.Velocity.Y, moveDirection.Y, delta);
         }
 
         // Fires projectiles
@@ -277,6 +280,7 @@ namespace RobotGame.Systems
                 Entity entity,
                 ref PlayerComponent player,
                 ref PositionComponent position,
+                ref VelocityComponent velocity,
                 ref PhysicsBodyComponent body,
                 ref PhysicsAreaComponent area,
                 ref HealthComponent health,
@@ -289,6 +293,7 @@ namespace RobotGame.Systems
                     Entity = entity,
                     Player = ref player,
                     Position = ref position,
+                    Velocity = ref velocity,
                     Body = ref body,
                     Area = ref area,
                     Health = ref health,

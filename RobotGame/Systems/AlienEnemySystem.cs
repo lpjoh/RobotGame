@@ -32,6 +32,7 @@ namespace RobotGame.Systems
                 AlienEnemyComponent,
                 EnemyComponent,
                 PositionComponent,
+                VelocityComponent,
                 PhysicsBodyComponent,
                 PhysicsAreaComponent,
                 SpriteComponent,
@@ -51,7 +52,8 @@ namespace RobotGame.Systems
                 new AlienEnemyComponent(),
                 new EnemyComponent(),
                 new PositionComponent { Position = position },
-                new PhysicsBodyComponent { Size = BodySize },
+                new VelocityComponent(),
+                new PhysicsBodyComponent { Size = BodySize, MoverMask = 1, ColliderMask = 0 },
                 new PhysicsAreaComponent { Rects = AreaRects },
                 new SpriteComponent { Texture = Game.Renderer.AlienEnemyTexture, Offset = SpriteOffset },
                 new SpriteAnimatorComponent());
@@ -62,10 +64,10 @@ namespace RobotGame.Systems
             return entity;
         }
 
-        public void RandomizeMovement(ref PhysicsBodyComponent body)
+        public void RandomizeMovement(ref VelocityComponent velocity)
         {
             float angle = Game.World.Random.Next() * MathF.PI * 2.0f;
-            body.Velocity = new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * Speed;
+            velocity.Velocity = new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * Speed;
         }
 
         public void Initialize()
@@ -84,6 +86,7 @@ namespace RobotGame.Systems
                 ref AlienEnemyComponent alienEnemy,
                 ref EnemyComponent enemy,
                 ref PositionComponent position,
+                ref VelocityComponent velocity,
                 ref PhysicsBodyComponent body,
                 ref PhysicsAreaComponent area,
                 ref SpriteComponent sprite,
@@ -94,10 +97,10 @@ namespace RobotGame.Systems
                 {
                     alienEnemy.MoveTimer = MoveTime;
 
-                    RandomizeMovement(ref body);
+                    RandomizeMovement(ref velocity);
 
                     // Flip if moving left
-                    sprite.FlipX = body.Velocity.X < 0.0f;
+                    sprite.FlipX = velocity.Velocity.X < 0.0f;
                 }
                 else
                 {

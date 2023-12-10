@@ -14,6 +14,7 @@ namespace RobotGame.Systems
             Query = new QueryDescription().WithAll<PhysicsAreaComponent, PositionComponent>();
         }
 
+        // Gets the rect of an area
         public static GameRect GetRect(PhysicsAreaComponent area, PositionComponent position, int index)
         {
             // Get area rect at index
@@ -49,7 +50,8 @@ namespace RobotGame.Systems
 
                 for (int ei2 = 0; ei2 < areaEntities.Count; ei2++)
                 {
-                    // End loop when second index reaches first, avoiding duplicate checks
+                    // End loop when second index reaches first,
+                    // avoiding duplicate checks
                     if (ei2 >= ei1)
                     {
                         break;

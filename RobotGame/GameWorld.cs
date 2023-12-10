@@ -3,16 +3,19 @@ using RobotGame.Systems;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using System;
+using RobotGame.Components;
 
 namespace RobotGame
 {
     public class GameWorld
     {
+        public const float WallThickness = 8.0f;
+
+        public GameRect WallsRect = new(new Vector2(30.0f, 18.0f), new Vector2(180.0f, 144.0f));
+
         public World Entities;
 
         public Entity Player;
-
-        public RobotGame Game;
 
         public PhysicsBodySystem PhysicsBodySystem;
         public PhysicsAreaSystem PhysicsAreaSystem;
@@ -32,9 +35,11 @@ namespace RobotGame
 
         public Random Random = new();
 
-        public Queue<Entity> EntityDestructionQueue = new();
+        public List<Entity> EntityDestructionQueue = new();
 
         public List<ISystem> Systems = new();
+
+        public RobotGame Game;
 
         public GameWorld(RobotGame game)
         {
@@ -75,10 +80,41 @@ namespace RobotGame
             GearDisplay = new GearDisplay(Game);
         }
 
+        // Creates a wall
+        public void CreateWall(GameRect rect)
+        {
+            Entities.Create(
+                new PositionComponent { Position = rect.Position },
+                new PhysicsBodyComponent { Size = rect.Size });
+        }
+
+        // Creates the game's walls
+        public void CreateWalls()
+        {
+            // Get rect sizes
+            Vector2 wideSize = new(WallsRect.Size.X, WallThickness), tallSize = new(WallThickness, WallsRect.Size.Y);
+
+            // Left
+            CreateWall(new GameRect(
+                new Vector2(WallsRect.Position.X - WallThickness, WallsRect.Position.Y), tallSize));
+
+            // Right
+            CreateWall(new GameRect(
+                new Vector2(WallsRect.Position.X + WallsRect.Size.X, WallsRect.Position.Y), tallSize));
+
+            // Top
+            CreateWall(new GameRect(
+                new Vector2(WallsRect.Position.X, WallsRect.Position.Y - WallThickness), wideSize));
+
+            // Bottom
+            CreateWall(new GameRect(
+                new Vector2(WallsRect.Position.X, WallsRect.Position.Y + WallsRect.Size.Y), wideSize));
+        }
+
         // Queues an entity to be destroyed
         public void QueueDestroyEntity(Entity entity)
         {
-            EntityDestructionQueue.Enqueue(entity);
+            EntityDestructionQueue.Add(entity);
         }
 
         public void Initialize()
@@ -90,6 +126,8 @@ namespace RobotGame
             {
                 system.Initialize();
             }
+
+            CreateWalls();
 
             Player = PlayerSystem.CreatePlayer(Entities, new Vector2(120.0f, 90.0f));
 
@@ -110,10 +148,12 @@ namespace RobotGame
             }
 
             // Delete queued entities
-            for (int i = 0; i < EntityDestructionQueue.Count; i++)
+            foreach (Entity entity in EntityDestructionQueue)
             {
-                Entities.Destroy(EntityDestructionQueue.Dequeue());
+                Entities.Destroy(entity);
             }
+
+            EntityDestructionQueue.Clear();
         }
     }
 }
