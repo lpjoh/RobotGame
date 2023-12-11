@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.IO;
+using System.Text;
 using System.Text.Json;
 
 namespace RobotGame
@@ -15,7 +16,7 @@ namespace RobotGame
         public int CharsPerRow;
         public int[] CharSpacings;
 
-        public TextRenderer(Texture2D texture, Point charSize, string spacingsPath)
+        public TextRenderer(Texture2D texture, Point charSize)
         {
             Texture = texture;
             CharSize = charSize;
@@ -23,12 +24,12 @@ namespace RobotGame
             CharsPerRow = Texture.Width / CharSize.X;
 
             // Load font spacing from json
-            string spacingsJson = File.ReadAllText(spacingsPath);
+            string spacingsJson = Encoding.UTF8.GetString(Properties.Resources.FontSpacings);
             CharSpacings = JsonSerializer.Deserialize<int[]>(spacingsJson);
         }
 
         // Returns the spacing for a character
-        public int GetSpacing(char c)
+        public int GetCharSpacing(char c)
         {
             int charIndex = c - 32;
 
@@ -57,7 +58,7 @@ namespace RobotGame
                     continue;
                 }
 
-                lineWidth += GetSpacing(c);
+                lineWidth += GetCharSpacing(c);
                 width = Math.Max(width, lineWidth);
             }
 
@@ -92,7 +93,7 @@ namespace RobotGame
 
                 renderer.SpriteBatch.Draw(Texture, charPosition, srcRect, color);
 
-                charPosition.X += GetSpacing(c);
+                charPosition.X += GetCharSpacing(c);
             }
         }
     }

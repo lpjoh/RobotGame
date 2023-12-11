@@ -126,6 +126,8 @@ namespace RobotGame.Systems
                 // Use hurt color
                 ref SpriteComponent sprite = ref entity.Get<SpriteComponent>();
                 sprite.Color = HurtColor;
+
+                Game.Audio.HurtSound.Play();
             }
         }
 

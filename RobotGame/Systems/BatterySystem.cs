@@ -80,6 +80,8 @@ namespace RobotGame.Systems
                     World.PlayerSystem.HealPlayer(World.Player, 1);
 
                     World.CollectibleSystem.CollectEntity(entity);
+
+                    Game.Audio.BatterySound.Play();
                 }
             });
         }

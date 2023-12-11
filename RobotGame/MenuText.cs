@@ -5,7 +5,7 @@ namespace RobotGame
     public class MenuText
     {
         public string Text;
-        public Vector2 Position = new(120.0f, 64.0f);
+        public Vector2 Position = new(120.0f, 48.0f);
         public Color Color;
 
         public RobotGame Game;

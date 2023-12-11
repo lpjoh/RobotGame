@@ -96,15 +96,15 @@ namespace RobotGame.Systems
                 ref SpriteComponent sprite,
                 ref SpriteAnimatorComponent spriteAnimator) =>
             {
+                // Flip if moving left
+                sprite.FlipX = velocity.Velocity.X < 0.0f;
+
                 // Randomize movement direction on a time step
                 if (alienEnemy.MoveTimer <= 0.0f)
                 {
                     alienEnemy.MoveTimer = MoveTime;
 
                     RandomizeMovement(ref velocity);
-
-                    // Flip if moving left
-                    sprite.FlipX = velocity.Velocity.X < 0.0f;
                 }
                 else
                 {

@@ -114,7 +114,7 @@ namespace RobotGame
             FontTexture = content.Load<Texture2D>("Textures/font_wide");
 
             // Create text renderer
-            TextRenderer = new TextRenderer(FontTexture, new Point(12, 12), "Content/font_spacings.json");
+            TextRenderer = new TextRenderer(FontTexture, new Point(12, 12));
         }
 
         public void Draw()

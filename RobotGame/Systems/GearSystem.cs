@@ -81,6 +81,8 @@ namespace RobotGame.Systems
                     World.Player.Get<PlayerComponent>().GearCount++;
 
                     World.CollectibleSystem.CollectEntity(entity);
+
+                    Game.Audio.GearSound.Play();
                 }
             });
         }

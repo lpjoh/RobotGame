@@ -34,6 +34,8 @@ namespace RobotGame.Systems
             }
 
             World.QueueDestroyEntity(entity);
+
+            Game.Audio.EnemyHurtSound.Play();
         }
 
         public void Initialize()

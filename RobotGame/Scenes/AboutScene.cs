@@ -1,9 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Media;
 
 namespace RobotGame.Scenes
 {
-    public class HelpScene : IGameScene
+    public class AboutScene : IGameScene
     {
         public MenuText MenuText;
 
@@ -12,7 +11,7 @@ namespace RobotGame.Scenes
 
         public RobotGame Game;
 
-        public HelpScene(RobotGame game)
+        public AboutScene(RobotGame game)
         {
             Game = game;
         }
@@ -20,11 +19,8 @@ namespace RobotGame.Scenes
         public void Initialize()
         {
             MenuText = new MenuText(Game,
-                "Collect as many gears as you can\n" +
-                "while avoiding enemy fire.\n" +
-                "Batteries will refill your health.\n" +
-                "WASD: Move, Arrow keys: Fire",
-                Color.Yellow);
+                "Game created by Leif Johannesson",
+                Color.Cyan);
 
             // Create buttons
             ButtonList = new ButtonList(Game);

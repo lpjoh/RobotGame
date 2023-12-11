@@ -25,6 +25,7 @@ namespace RobotGame.Scenes
 
             PlayButton = ButtonList.CreateButton("Play game");
             HelpButton = ButtonList.CreateButton("Help");
+            AboutButton = ButtonList.CreateButton("About");
         }
 
         public void Update(float delta)
@@ -41,6 +42,12 @@ namespace RobotGame.Scenes
             {
                 // Show help
                 Game.ChangeScene(new HelpScene(Game));
+            }
+
+            if (AboutButton.Clicked)
+            {
+                // Show help
+                Game.ChangeScene(new AboutScene(Game));
             }
         }
 
