@@ -13,12 +13,15 @@ namespace RobotGame.Systems
 
         public SpriteAnimation TurnAnimation;
 
-        public RobotGame Game;
         public QueryDescription Query;
 
-        public GearSystem(RobotGame game)
+        public RobotGame Game;
+        public GameWorld World;
+
+        public GearSystem(RobotGame game, GameWorld world)
         {
             Game = game;
+            World = world;
 
             Query = new QueryDescription().WithAll<
                 GearComponent,
@@ -75,9 +78,9 @@ namespace RobotGame.Systems
                 if (collectible.Collected)
                 {
                     // Add to player's gear count
-                    Game.World.Player.Get<PlayerComponent>().GearCount++;
+                    World.Player.Get<PlayerComponent>().GearCount++;
 
-                    Game.World.CollectibleSystem.CollectEntity(entity);
+                    World.CollectibleSystem.CollectEntity(entity);
                 }
             });
         }

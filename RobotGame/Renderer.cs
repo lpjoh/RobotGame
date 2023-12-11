@@ -8,6 +8,8 @@ namespace RobotGame
 {
     public class Renderer
     {
+        public int WindowScale = 3;
+
         public RenderTarget2D RenderTarget;
         public Rectangle RenderTargetRect;
 
@@ -53,35 +55,6 @@ namespace RobotGame
             Game = game;
         }
 
-        // Draws debug info
-        public void DrawDebug()
-        {
-            World entities = Game.World.Entities;
-
-            PhysicsBodyRendererSystem.Draw(this, entities);
-            PhysicsAreaRendererSystem.Draw(this, entities);
-        }
-
-        // Draws the game world
-        public void DrawWorld()
-        {
-            World entities = Game.World.Entities;
-
-            SpriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend);
-
-            SpriteBatch.Draw(BackgroundTexture, Vector2.Zero, Color.White);
-
-            SpriteSystem.Draw(this, entities);
-
-            // Draw stat displays
-            Game.World.HealthBar.Draw(this);
-            Game.World.GearDisplay.Draw(this);
-
-            //DrawDebug();
-
-            SpriteBatch.End();
-        }
-
         public void Initialize()
         {
             // Get graphics objects from game
@@ -89,8 +62,8 @@ namespace RobotGame
             GraphicsDevice = Game.GraphicsDevice;
 
             // Set window resolution
-            Graphics.PreferredBackBufferWidth = 240 * 3;
-            Graphics.PreferredBackBufferHeight = 180 * 3;
+            Graphics.PreferredBackBufferWidth = 240 * WindowScale;
+            Graphics.PreferredBackBufferHeight = 180 * WindowScale;
 
             Graphics.ApplyChanges();
 
@@ -106,16 +79,11 @@ namespace RobotGame
 
             // Add systems
             SpriteSystem = new SpriteSystem();
-
             SpriteAnimatorSystem = new SpriteAnimatorSystem();
-            Game.World.Systems.Add(SpriteAnimatorSystem);
 
-            // Add debug systems
+            // Create debug systems
             PhysicsBodyRendererSystem = new PhysicsBodyRendererSystem(this);
-            Game.World.Systems.Add(PhysicsBodyRendererSystem);
-
             PhysicsAreaRendererSystem = new PhysicsAreaRendererSystem(this);
-            Game.World.Systems.Add(PhysicsAreaRendererSystem);
         }
 
         public void LoadContent()
@@ -155,7 +123,11 @@ namespace RobotGame
             GraphicsDevice.SetRenderTarget(RenderTarget);
             GraphicsDevice.Clear(Color.Black);
 
-            DrawWorld();
+            SpriteBatch.Begin(samplerState: SamplerState.PointClamp, blendState: BlendState.AlphaBlend);
+
+            Game.CurrentScene.Draw();
+
+            SpriteBatch.End();
 
             // Draw to main window
             GraphicsDevice.SetRenderTarget(null);

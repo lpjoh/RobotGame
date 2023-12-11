@@ -13,12 +13,15 @@ namespace RobotGame.Systems
 
         public SpriteAnimation FlashAnimation;
 
-        public RobotGame Game;
         public QueryDescription Query;
 
-        public BatterySystem(RobotGame game)
+        public RobotGame Game;
+        public GameWorld World;
+
+        public BatterySystem(RobotGame game, GameWorld world)
         {
             Game = game;
+            World = world;
 
             Query = new QueryDescription().WithAll<
                 BatteryComponent,
@@ -74,9 +77,9 @@ namespace RobotGame.Systems
             {
                 if (collectible.Collected)
                 {
-                    Game.World.PlayerSystem.HealPlayer(Game.World.Player, 1);
+                    World.PlayerSystem.HealPlayer(World.Player, 1);
 
-                    Game.World.CollectibleSystem.CollectEntity(entity);
+                    World.CollectibleSystem.CollectEntity(entity);
                 }
             });
         }

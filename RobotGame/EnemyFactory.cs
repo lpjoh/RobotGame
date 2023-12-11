@@ -13,18 +13,21 @@ namespace RobotGame
         public const int MaxEnemies = 8;
         public const float MinPlayerDistance = 32.0f;
 
-        public RobotGame Game;
         public float SpawnTimer;
 
         public Vector2[] SpawnPoints;
 
         public QueryDescription EnemyQuery;
 
-        public EnemyFactory(RobotGame game)
+        public RobotGame Game;
+        public GameWorld World;
+
+        public EnemyFactory(RobotGame game, GameWorld world)
         {
             Game = game;
+            World = world;
 
-            GameRect wallsRect = Game.World.WallsRect;
+            GameRect wallsRect = World.WallsRect;
 
             Vector2
                 spawnPointsStart = wallsRect.Position + new Vector2(SpawnPointPadding),
@@ -49,19 +52,19 @@ namespace RobotGame
 
                 // Check enemy threshold
                 List<Entity> enemies = new();
-                Game.World.Entities.GetEntities(EnemyQuery, enemies);
+                World.Entities.GetEntities(EnemyQuery, enemies);
 
                 if (enemies.Count < MaxEnemies)
                 {
                     // Spawn at random position, away from player
-                    Entity player = Game.World.Player;
+                    Entity player = World.Player;
                     Vector2 playerPosition = player.Get<PositionComponent>().Position + player.Get<PhysicsBodyComponent>().Size * 0.5f;
 
                     Vector2 spawnPoint;
 
                     while (true)
                     {
-                        spawnPoint = SpawnPoints[Game.World.Random.Next() % SpawnPoints.Length];
+                        spawnPoint = SpawnPoints[World.Random.Next() % SpawnPoints.Length];
                         
                         if (Vector2.Distance(playerPosition, spawnPoint) >= MinPlayerDistance)
                         {
@@ -69,7 +72,7 @@ namespace RobotGame
                         }
                     }
 
-                    Game.World.AlienEnemySystem.CreateAlienEnemy(Game.World.Entities, spawnPoint);
+                    World.AlienEnemySystem.CreateAlienEnemy(World.Entities, spawnPoint);
                 }
             }
             else

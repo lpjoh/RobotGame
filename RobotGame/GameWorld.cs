@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework;
 using System;
 using RobotGame.Components;
 using Arch.Core.Extensions;
+using Microsoft.Xna.Framework.Media;
+using RobotGame.Scenes;
 
 namespace RobotGame
 {
@@ -56,31 +58,38 @@ namespace RobotGame
             Systems.Add(PhysicsAreaSystem);
 
             // Main entities
-            PlayerSystem = new PlayerSystem(Game);
+            PlayerSystem = new PlayerSystem(Game, this);
             Systems.Add(PlayerSystem);
 
-            BulletSystem = new BulletSystem(Game);
+            BulletSystem = new BulletSystem(Game, this);
             Systems.Add(BulletSystem);
 
-            EnemySystem = new EnemySystem(Game);
+            EnemySystem = new EnemySystem(Game, this);
             Systems.Add(EnemySystem);
 
-            AlienEnemySystem = new AlienEnemySystem(Game);
+            AlienEnemySystem = new AlienEnemySystem(Game, this);
             Systems.Add(AlienEnemySystem);
 
             // Collectibles
-            CollectibleSystem = new CollectibleSystem(Game);
+            CollectibleSystem = new CollectibleSystem(Game, this);
             Systems.Add(CollectibleSystem);
 
-            GearSystem = new GearSystem(Game);
+            GearSystem = new GearSystem(Game, this);
             Systems.Add(GearSystem);
 
-            BatterySystem = new BatterySystem(Game);
+            BatterySystem = new BatterySystem(Game, this);
             Systems.Add(BatterySystem);
 
             // Create stat displays
-            HealthBar = new HealthBar(Game);
-            GearDisplay = new GearDisplay(Game);
+            HealthBar = new HealthBar(Game, this);
+            GearDisplay = new GearDisplay(Game, this);
+        }
+
+        // Loses the game
+        public void LoseGame()
+        {
+            // Go to lose screen
+            Game.ChangeScene(new LoseScene(Game));
         }
 
         // Creates a wall
@@ -130,13 +139,24 @@ namespace RobotGame
                 system.Initialize();
             }
 
+            // Add renderer systems
+            Renderer renderer = Game.Renderer;
+
+            Systems.Add(renderer.SpriteAnimatorSystem);
+            Systems.Add(renderer.PhysicsBodyRendererSystem);
+            Systems.Add(renderer.PhysicsAreaRendererSystem);
+
+            // Create objects
             CreateWalls();
 
             Player = PlayerSystem.CreatePlayer(Entities, new Vector2(120.0f, 90.0f));
 
-            EnemyFactory = new EnemyFactory(Game);
+            EnemyFactory = new EnemyFactory(Game, this);
 
             HealthBar.UpdateDisplay();
+
+            // Play music
+            MediaPlayer.Play(Game.Audio.Music);
         }
 
         public void Update(float delta)
@@ -162,6 +182,27 @@ namespace RobotGame
             }
 
             EntityDestructionQueue.Clear();
+        }
+
+        // Draws debug info
+        public void DrawDebug(Renderer renderer)
+        {
+            renderer.PhysicsBodyRendererSystem.Draw(renderer, Entities);
+            renderer.PhysicsAreaRendererSystem.Draw(renderer, Entities);
+        }
+
+        // Draws the game world
+        public void Draw(Renderer renderer)
+        {
+            renderer.SpriteBatch.Draw(renderer.BackgroundTexture, Vector2.Zero, Color.White);
+
+            renderer.SpriteSystem.Draw(renderer, Entities);
+
+            // Draw stat displays
+            HealthBar.Draw(renderer);
+            GearDisplay.Draw(renderer);
+
+            //DrawDebug();
         }
     }
 }

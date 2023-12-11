@@ -21,5 +21,15 @@ namespace RobotGame
                 rect1.Position.Y < rect2.Position.Y + rect2.Size.Y &&
                 rect1.Position.Y + rect1.Size.Y > rect2.Position.Y;
         }
+
+        // Returns whether a rect contains a point
+        public static bool Contains(GameRect rect, Vector2 point)
+        {
+            return
+                rect.Position.X < point.X &&
+                rect.Position.X + rect.Size.X > point.X &&
+                rect.Position.Y < point.Y &&
+                rect.Position.Y + rect.Size.Y > point.Y;
+        }
     }
 }

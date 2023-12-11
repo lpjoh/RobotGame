@@ -6,12 +6,15 @@ namespace RobotGame.Systems
 {
     public class CollectibleSystem : ISystem
     {
-        public RobotGame Game;
         public QueryDescription Query;
 
-        public CollectibleSystem(RobotGame game)
+        public RobotGame Game;
+        public GameWorld World;
+
+        public CollectibleSystem(RobotGame game, GameWorld world)
         {
             Game = game;
+            World = world;
 
             Query = new QueryDescription().WithAll<
                 CollectibleComponent, 
@@ -20,7 +23,7 @@ namespace RobotGame.Systems
 
         public void CollectEntity(Entity entity)
         {
-            Game.World.QueueDestroyEntity(entity);
+            World.QueueDestroyEntity(entity);
         }
 
         public void Initialize()
@@ -38,7 +41,7 @@ namespace RobotGame.Systems
                 // Update despawn timer
                 if (collectible.DespawnTimer <= 0.0f)
                 {
-                    Game.World.QueueDestroyEntity(entity);
+                    World.QueueDestroyEntity(entity);
                 }
                 else
                 {

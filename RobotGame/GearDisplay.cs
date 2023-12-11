@@ -11,20 +11,22 @@ namespace RobotGame
             TextPosition = new(36.0f, 2.0f);
 
         public RobotGame Game;
+        public GameWorld World;
 
-        public GearDisplay(RobotGame game)
+        public GearDisplay(RobotGame game, GameWorld world)
         {
             Game = game;
+            World = world;
         }
 
         public void Draw(Renderer renderer)
         {
             // Get player's gear count
-            int gearCount = Game.World.Player.Get<PlayerComponent>().GearCount;
+            int gearCount = World.Player.Get<PlayerComponent>().GearCount;
 
             // Draw icon and count text
             renderer.SpriteBatch.Draw(renderer.GearIconTexture, IconPosition, Color.White);
-            renderer.TextRenderer.DrawText(renderer, "x" + gearCount, TextPosition);
+            renderer.TextRenderer.DrawText(renderer, "x" + gearCount, TextPosition, Color.White);
         }
     }
 }

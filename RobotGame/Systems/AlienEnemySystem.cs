@@ -22,12 +22,15 @@ namespace RobotGame.Systems
 
         public SpriteAnimation WalkAnimation;
 
-        public RobotGame Game;
         public QueryDescription Query;
 
-        public AlienEnemySystem(RobotGame game)
+        public RobotGame Game;
+        public GameWorld World;
+
+        public AlienEnemySystem(RobotGame game, GameWorld world)
         {
             Game = game;
+            World = world;
 
             Query = new QueryDescription().WithAll<
                 AlienEnemyComponent,
@@ -67,7 +70,7 @@ namespace RobotGame.Systems
 
         public void RandomizeMovement(ref VelocityComponent velocity)
         {
-            float angle = Game.World.Random.Next() * MathF.PI * 2.0f;
+            float angle = World.Random.Next() * MathF.PI * 2.0f;
             velocity.Velocity = new Vector2(MathF.Cos(angle), MathF.Sin(angle)) * Speed;
         }
 
@@ -116,7 +119,7 @@ namespace RobotGame.Systems
                     // Aim orthogonally to player
                     Vector2 bulletDirection;
 
-                    Vector2 playerPos = Game.World.Player.Get<PositionComponent>().Position;
+                    Vector2 playerPos = World.Player.Get<PositionComponent>().Position;
                     Vector2 toPlayer = playerPos - position.Position;
 
                     if (MathF.Abs(toPlayer.X) < MathF.Abs(toPlayer.Y))
@@ -128,7 +131,7 @@ namespace RobotGame.Systems
                         bulletDirection = new Vector2(MathF.Sign(toPlayer.X), 0.0f);
                     }
 
-                    Game.World.BulletSystem.CreateBullet(
+                    World.BulletSystem.CreateBullet(
                         entities, position.Position + body.Size * 0.5f, bulletDirection, BulletSpeed, BulletType.Enemy);
                 }
                 else

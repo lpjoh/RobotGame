@@ -8,8 +8,9 @@ namespace RobotGame.Systems
     {
         public RectRenderer RectRenderer;
 
-        public Renderer Renderer;
         public QueryDescription Query;
+
+        public Renderer Renderer;
 
         public PhysicsAreaRendererSystem(Renderer renderer)
         {

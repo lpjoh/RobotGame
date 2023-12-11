@@ -14,10 +14,12 @@ namespace RobotGame
         public Rectangle FrontDstRect, FrontSrcRect;
 
         public RobotGame Game;
+        public GameWorld World;
 
-        public HealthBar(RobotGame game)
+        public HealthBar(RobotGame game, GameWorld world)
         {
             Game = game;
+            World = world;
         }
 
         // Updates the display based on health
@@ -26,7 +28,7 @@ namespace RobotGame
             Texture2D frontTexture = Game.Renderer.HealthFrontTexture;
 
             // Get ratio between player's health and max health
-            HealthComponent health = Game.World.Player.Get<HealthComponent>();
+            HealthComponent health = World.Player.Get<HealthComponent>();
             float healthRatio = health.Value / (float)health.MaxValue;
 
             // Scale rect by ratio, with ceiling to fill entire space

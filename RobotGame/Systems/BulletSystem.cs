@@ -19,12 +19,15 @@ namespace RobotGame.Systems
 
         public SpriteAnimation FlashAnimation, EndAnimation;
 
-        public RobotGame Game;
         public QueryDescription Query;
 
-        public BulletSystem(RobotGame game)
+        public RobotGame Game;
+        public GameWorld World;
+
+        public BulletSystem(RobotGame game, GameWorld world)
         {
             Game = game;
+            World = world;
 
             Query = new QueryDescription().WithAll<
                 BulletComponent,
@@ -117,7 +120,7 @@ namespace RobotGame.Systems
                 {
                     if (spriteAnimator.Finished)
                     {
-                        Game.World.QueueDestroyEntity(entity);
+                        World.QueueDestroyEntity(entity);
                     }
 
                     return;
@@ -140,7 +143,7 @@ namespace RobotGame.Systems
                                 continue;
                             }
 
-                            Game.World.EnemySystem.DestroyEnemy(collision.Entity);
+                            World.EnemySystem.DestroyEnemy(collision.Entity);
                             DestroyBullet(entity);
                         }
 
@@ -160,7 +163,7 @@ namespace RobotGame.Systems
                                 continue;
                             }
 
-                            Game.World.PlayerSystem.DamagePlayer(collision.Entity, 1);
+                            World.PlayerSystem.DamagePlayer(collision.Entity, 1);
                             DestroyBullet(entity);
                         }
 

@@ -48,12 +48,15 @@ namespace RobotGame.Systems
 
         public Color HurtColor = Color.Red;
 
-        public RobotGame Game;
         public QueryDescription Query;
 
-        public PlayerSystem(RobotGame game)
+        public RobotGame Game;
+        public GameWorld World;
+
+        public PlayerSystem(RobotGame game, GameWorld world)
         {
             Game = game;
+            World = world;
 
             Query = new QueryDescription().WithAll<
                 PlayerComponent,
@@ -108,11 +111,12 @@ namespace RobotGame.Systems
             Health.ModifyHealth(ref health, health.Value - amount);
 
             // Update health bar
-            Game.World.HealthBar.UpdateDisplay();
+            World.HealthBar.UpdateDisplay();
 
             if (health.Value <= 0)
             {
-
+                // Lose game
+                World.LoseGame();
             }
             else
             {
@@ -133,7 +137,7 @@ namespace RobotGame.Systems
             Health.ModifyHealth(ref playerHealth, playerHealth.Value + amount);
 
             // Update health bar
-            Game.World.HealthBar.UpdateDisplay();
+            World.HealthBar.UpdateDisplay();
         }
 
         // Returns a facing direction based on movement
@@ -221,7 +225,7 @@ namespace RobotGame.Systems
                 if (shootDirection != Vector2.Zero)
                 {
                     // Summon bullet centered on the player's hitbox
-                    BulletSystem bulletSystem = Game.World.BulletSystem;
+                    BulletSystem bulletSystem = World.BulletSystem;
 
                     Vector2 bulletPosition =
                         playerData.Position.Position + playerData.Body.Size * 0.5f;
@@ -307,8 +311,8 @@ namespace RobotGame.Systems
                 // Obtain input variables
                 Input input = Game.Input;
 
-                Vector2 moveDirection = input.GetAxis(Keys.W, Keys.S, Keys.A, Keys.D);
-                Vector2 shootDirection = input.GetAxis(Keys.Up, Keys.Down, Keys.Left, Keys.Right);
+                Vector2 moveDirection = input.GetVector(Keys.W, Keys.S, Keys.A, Keys.D);
+                Vector2 shootDirection = input.GetVector(Keys.Up, Keys.Down, Keys.Left, Keys.Right);
 
                 // Perform actions
                 Move(ref playerData, moveDirection, delta);

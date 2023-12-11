@@ -8,30 +8,32 @@ namespace RobotGame.Systems
     public class EnemySystem : ISystem
     {
         public RobotGame Game;
+        public GameWorld World;
 
-        public EnemySystem(RobotGame game)
+        public EnemySystem(RobotGame game, GameWorld world)
         {
             Game = game;
+            World = world;
         }
 
         // Destroys an enemy
         public void DestroyEnemy(Entity entity)
         {
-            World entities = Game.World.Entities;
+            World entities = World.Entities;
 
             // Create a random drop
             Vector2 dropPosition = entity.Get<PositionComponent>().Position + entity.Get<PhysicsBodyComponent>().Size * 0.5f;
 
-            if (Game.World.Random.Next() % 4 == 0)
+            if (World.Random.Next() % 4 == 0)
             {
-                Game.World.BatterySystem.CreateBattery(entities, dropPosition);
+                World.BatterySystem.CreateBattery(entities, dropPosition);
             }
             else
             {
-                Game.World.GearSystem.CreateGear(entities, dropPosition);
+                World.GearSystem.CreateGear(entities, dropPosition);
             }
 
-            Game.World.QueueDestroyEntity(entity);
+            World.QueueDestroyEntity(entity);
         }
 
         public void Initialize()

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using RobotGame.Scenes;
 
 namespace RobotGame
 {
@@ -7,10 +8,12 @@ namespace RobotGame
     {
         public GraphicsDeviceManager Graphics;
 
-        public GameWorld World;
         public Renderer Renderer;
+        public AudioController Audio;
 
         public Input Input = new();
+
+        public IGameScene CurrentScene;
 
         public RobotGame()
         {
@@ -18,14 +21,22 @@ namespace RobotGame
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-
-            World = new GameWorld(this);
+            
             Renderer = new Renderer(this);
+            Audio = new AudioController(this);
+        }
+
+        // Changes to a new scene
+        public void ChangeScene(IGameScene scene)
+        {
+            CurrentScene = scene;
+            scene.Initialize();
         }
 
         protected override void Initialize()
         {
             Renderer.Initialize();
+            Audio.Initialize();
 
             base.Initialize();
         }
@@ -34,7 +45,7 @@ namespace RobotGame
         {
             Renderer.LoadContent();
 
-            World.Initialize();
+            ChangeScene(new MenuScene(this));
 
             base.LoadContent();
         }
@@ -46,7 +57,9 @@ namespace RobotGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            World.Update(delta);
+            CurrentScene.Update(delta);
+
+            Input.Update();
 
             base.Update(gameTime);
         }
